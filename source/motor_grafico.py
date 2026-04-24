@@ -6,40 +6,40 @@ import numpy as np
 #import plotly.graph_objects as go, esta libreria tal vez la uso pero aún no se
 
 #Voy a crear mocks de RawSignal, Epocas, Info y Eventos para probar si la clase MotorGrafico funciona
-class Info:
-    def __init__(self):
-        self.frecuencia_muestreo = 100 #Hz
+#class Info:
+#    def __init__(self):
+#        self.frecuencia_muestreo = 100 #Hz
 
-class Eventos:
-    def __init__(self):
+#class Eventos:
+#    def __init__(self):
         #lista de (muestra,id_evento)
-        self._eventos = [(50,1),(150,2),(300,3)]
+#        self._eventos = [(50,1),(150,2),(300,3)]
 
-    def get_eventos(self):
-        return self._eventos
+#    def get_eventos(self):
+#        return self._eventos
 
-class RawSignal:
-    def __init__(self):
-        import numpy as np
+#class RawSignal:
+#    def __init__(self):
+#        import numpy as np
 
-        self.info = Info()
-        self.eventos = Eventos()
+#        self.info = Info()
+#        self.eventos = Eventos()
 
         #señal fake de 2 canales
-        self._data = np.array([np.sin(np.linspace(0,100,500)),np.cos(np.linspace(0,100,500))])
+#        self._data = np.array([np.sin(np.linspace(0,100,500)),np.cos(np.linspace(0,100,500))])
     
-    def get_data(self, picks = None):
-        return self._data
+#    def get_data(self, picks = None):
+#        return self._data
 
-class Epocas:
-   def __init__(self):
-       import numpy as np
+#class Epocas:
+#   def __init__(self):
+#       import numpy as np
 
         # 3 épocas, cada una con 2 canales
-       self._data = [np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)])]
+#       self._data = [np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)])]
 
-   def get_data(self):
-       return self._data
+#   def get_data(self):
+#       return self._data
 
 class MotorGrafico(): #creo la clase MotorGrafico
     def __init__(self,senal_actual : RawSignal,epocas : Epocas,modo_visualizacion : str,canales_visibles : list[str],mostrar_anotaciones : bool,rango_tiempo : tuple[float,float]): #defino los atributos de la clase
@@ -181,16 +181,16 @@ class MotorGrafico(): #creo la clase MotorGrafico
         plt.close()
 
 # Crear objetos fake
-raw = RawSignal()
-epocas = Epocas()
+#raw = RawSignal()
+#epocas = Epocas()
 
 # Crear motor
-motor = MotorGrafico(senal_actual=raw,epocas=epocas,modo_visualizacion="señal",canales_visibles=["C1", "C2"],mostrar_anotaciones=True,rango_tiempo=(0, 3))
+#motor = MotorGrafico(senal_actual=raw,epocas=epocas,modo_visualizacion="señal",canales_visibles=["C1", "C2"],mostrar_anotaciones=True,rango_tiempo=(0, 3))
 
 # Probar métodos
-motor.graficar_senal()
-motor.graficar_epocas()
-motor.guardar_imagen("test2connumpy.png")
+#motor.graficar_senal()
+#motor.graficar_epocas()
+#motor.guardar_imagen("test2connumpy.png")
             
         
 
