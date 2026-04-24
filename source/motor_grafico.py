@@ -2,43 +2,44 @@
 #Para que esta clase funcione necesitamos las clases RawSignal y Epocas
 #Importo librerias de plt 
 import matplotlib.pyplot as plt
+import numpy as np
 #import plotly.graph_objects as go, esta libreria tal vez la uso pero aún no se
 
 #Voy a crear mocks de RawSignal, Epocas, Info y Eventos para probar si la clase MotorGrafico funciona
-#class Info:
-  #  def __init__(self):
- #       self.frecuencia_muestreo = 100 #Hz
+class Info:
+    def __init__(self):
+        self.frecuencia_muestreo = 100 #Hz
 
-#class Eventos:
-    #def __init__(self):
+class Eventos:
+    def __init__(self):
         #lista de (muestra,id_evento)
-   #     self._eventos = [(50,1),(150,2),(300,3)]
+        self._eventos = [(50,1),(150,2),(300,3)]
 
-  #  def get_eventos(self):
- #       return self._eventos
+    def get_eventos(self):
+        return self._eventos
 
-#class RawSignal:
-   # def __init__(self):
-   #     import numpy as np
+class RawSignal:
+    def __init__(self):
+        import numpy as np
 
-  #      self.info = Info()
- #       self.eventos = Eventos()
+        self.info = Info()
+        self.eventos = Eventos()
 
         #señal fake de 2 canales
-#        self._data = [np.sin(np.linspace(0,100,500)),np.cos(np.linspace(0,100,500))]
+        self._data = np.array([np.sin(np.linspace(0,100,500)),np.cos(np.linspace(0,100,500))])
     
-    #def get_data(self, picks = None):
-        #return self._data
+    def get_data(self, picks = None):
+        return self._data
 
-#class Epocas:
-#   def __init__(self):
-#       import numpy as np
+class Epocas:
+   def __init__(self):
+       import numpy as np
 
         # 3 épocas, cada una con 2 canales
-#       self._data = [[np.random.randn(100), np.random.randn(100)],[np.random.randn(100), np.random.randn(100)],[np.random.randn(100), np.random.randn(100)]]
+       self._data = [np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)])]
 
-#   def get_data(self):
-#       return self._data
+   def get_data(self):
+       return self._data
 
 class MotorGrafico(): #creo la clase MotorGrafico
     def __init__(self,senal_actual : RawSignal,epocas : Epocas,modo_visualizacion : str,canales_visibles : list[str],mostrar_anotaciones : bool,rango_tiempo : tuple[float,float]): #defino los atributos de la clase
@@ -65,10 +66,11 @@ class MotorGrafico(): #creo la clase MotorGrafico
             inicio_muestra = int(inicio*fs)
             fin_muestra = int(fin*fs)
             #recorto cada canal
-            data = [canal[inicio_muestra:fin_muestra]for canal in data]
+            #data = [canal[inicio_muestra:fin_muestra]for canal in data] voy a cambiar esto para usar numpy
+            data = data[:, inicio_muestra:fin_muestra]
 
-        for canal in data:
-            plt.plot(canal)
+        #for canal in data:    #esto lo puedo cambiar por algo diferente plt.plot(data.T) con .T cada canal se grafica como una línea
+        plt.plot(data.T)
 
         #get_data() método de RawSignal, lo definimos en la clase RawSignal.Me sirve para obtener los datos de la señal 
         plt.title("Señal")
@@ -89,8 +91,7 @@ class MotorGrafico(): #creo la clase MotorGrafico
         data = self.epocas.get_data() #obtengo los datos de las épocas
         #recorremos las épocas con el for 
         for i, epoca in enumerate(data):
-            for canal in epoca:
-                plt.plot(canal)
+            plt.plot(epoca.T)
             plt.title(f"Época{i}")
             if mostrar:
                 plt.show()
@@ -101,8 +102,8 @@ class MotorGrafico(): #creo la clase MotorGrafico
         data = self.epocas.get_data() #obtengo las épocas
 
         epoca = data[indice] #según el índice elijo la época que quiero
-        for canal in epoca:
-            plt.plot(canal)
+        
+        plt.plot(epoca.T)
         
         plt.title(f"Época{indice}")
         plt.xlabel("Muestras")
@@ -128,7 +129,7 @@ class MotorGrafico(): #creo la clase MotorGrafico
             id_evento = evento[1] #tipo de evento, identificador de el tipo de evento
 
             plt.axvline(x = muestra, linestyle = "--") #dibujp una línea vertical en la posición del evento
-            plt.text(muestra, 0, str(id_evento), rotation = 90) #etiquete con el id del evento
+            plt.text(muestra, plt.ylim()[1], str(id_evento), rotation = 90) #etiquete con el id del evento
     
     def seleccionar_intervalo(self, inicio : float, fin : float):
         #Me combiene verificar que el intervalo sea válido
@@ -180,16 +181,16 @@ class MotorGrafico(): #creo la clase MotorGrafico
         plt.close()
 
 # Crear objetos fake
-#raw = RawSignal()
-#epocas = Epocas()
+raw = RawSignal()
+epocas = Epocas()
 
 # Crear motor
-#motor = MotorGrafico(senal_actual=raw,epocas=epocas,modo_visualizacion="señal",canales_visibles=["C1", "C2"],mostrar_anotaciones=True,rango_tiempo=(0, 3))
+motor = MotorGrafico(senal_actual=raw,epocas=epocas,modo_visualizacion="señal",canales_visibles=["C1", "C2"],mostrar_anotaciones=True,rango_tiempo=(0, 3))
 
 # Probar métodos
-#motor.graficar_senal()
-#motor.graficar_epocas()
-#motor.guardar_imagen("test.png")
+motor.graficar_senal()
+motor.graficar_epocas()
+motor.guardar_imagen("test2connumpy.png")
             
         
 
