@@ -57,18 +57,19 @@ class MotorGrafico(): #creo la clase MotorGrafico
         if self.senal_actual is None: #verifico que tengamos una señal cargada
             raise ValueError("No se encuentra una señal cargada")
         
-        data = self.senal_actual.get_data(picks=self.canales_visibles) #obtengo los datos de los canales seleccionados
+        if self.canales_visibles is not None:
+            data = self.senal_actual.get_data(self.canales_visibles)
+        else:
+            data = self.senal_actual.get_data()
         #Si hay un intervalo seleccionado, lo aplico
         if self.rango_tiempo is not None:
             inicio,fin = self.rango_tiempo
-
             fs = self.senal_actual.info.frecuencia_muestreo
-            inicio_muestra = int(inicio*fs)
-            fin_muestra = int(fin*fs)
+           # inicio_muestra = int(inicio*fs)
+           # fin_muestra = int(fin*fs)
             #recorto cada canal
             #data = [canal[inicio_muestra:fin_muestra]for canal in data] voy a cambiar esto para usar numpy
-            data = data[:, inicio_muestra:fin_muestra]
-
+            data = data[:,int(inicio*fs):int(fin*fs)]
         #for canal in data:    #esto lo puedo cambiar por algo diferente plt.plot(data.T) con .T cada canal se grafica como una línea
         plt.plot(data.T)
 
@@ -192,6 +193,7 @@ class MotorGrafico(): #creo la clase MotorGrafico
 #motor.graficar_epocas()
 #motor.guardar_imagen("test2connumpy.png")
             
-        
+        #probar si grafica señales de 1xN, o 3xN etc, si es lo suficiente general
+
 
         
