@@ -1,48 +1,41 @@
-#Código para el motor gráfico
-#Para que esta clase funcione necesitamos las clases RawSignal y Epocas
-#Importo librerias de plt 
+#Clase MotorGráfico
 import matplotlib.pyplot as plt
 import numpy as np
 #import plotly.graph_objects as go, esta libreria tal vez la uso pero aún no se
 
-#Voy a crear mocks de RawSignal, Epocas, Info y Eventos para probar si la clase MotorGrafico funciona
-#class Info:
-#    def __init__(self):
-#        self.frecuencia_muestreo = 100 #Hz
+"""
+El motor gráfico deber ser independiente del tipo de señal biomédica.
+Debe funcionar con cualquier señal organizada como: canales x muesrras.
+Por ejemplo:
+ECG -> una o pocas derivaciones
+EEG -> muchos canales
+EMG -> cantidad variable de canales
+"""
 
-#class Eventos:
-#    def __init__(self):
-        #lista de (muestra,id_evento)
-#        self._eventos = [(50,1),(150,2),(300,3)]
 
-#    def get_eventos(self):
-#        return self._eventos
+class MotorGrafico():
 
-#class RawSignal:
-#    def __init__(self):
-#        import numpy as np
+    """
+    Motor de visualización genérico para señales biomédicas.
+    La clase permite visualizar señales multicanal y épocas, independientemente del tipo de señal biompedica (ECG, EEG, EMG, etc.).
+    El motor asume que las señales están organizadas con forma: canales x muestras.
+    """
+    def __init__(self,senal_actual : RawSignal,epocas : Epocas,modo_visualizacion : str,canales_visibles : list[str],mostrar_anotaciones : bool,rango_tiempo : tuple[float,float]):
 
-#        self.info = Info()
-#        self.eventos = Eventos()
+        """
+        Inicializa el motor gráfico.
 
-        #señal fake de 2 canales
-#        self._data = np.array([np.sin(np.linspace(0,100,500)),np.cos(np.linspace(0,100,500))])
-    
-#    def get_data(self, picks = None):
-#        return self._data
+        Parámetros
+        ----------
 
-#class Epocas:
-#   def __init__(self):
-#       import numpy as np
+        senal_actual : RawSignal  #Señal biomédica actual a visualizar
+        epocas : Epocas  #Conjunto de épocas asociadas a la señal
+        modo_visualización : str  #Modo de visualización actual, puede ser "señal" o "épocas".
+        canales_visibles : list[str]  #Lista de canales a visualizar.
+        mostrar_anotaciones : bool  #Indica si se deben mostrar eventos/notaciones
+        rango_tiempo : tuple[float, float]  #Intervalo temporal a visualizar en segundos.
+        """
 
-        # 3 épocas, cada una con 2 canales
-#       self._data = [np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)]),np.array([np.random.randn(100), np.random.randn(100)])]
-
-#   def get_data(self):
-#       return self._data
-
-class MotorGrafico(): #creo la clase MotorGrafico
-    def __init__(self,senal_actual : RawSignal,epocas : Epocas,modo_visualizacion : str,canales_visibles : list[str],mostrar_anotaciones : bool,rango_tiempo : tuple[float,float]): #defino los atributos de la clase
         self.senal_actual = senal_actual
         self.epocas = epocas
         self.modo_visualizacion = modo_visualizacion
@@ -51,59 +44,89 @@ class MotorGrafico(): #creo la clase MotorGrafico
         self.rango_tiempo = rango_tiempo
     
 
-    #Métodos de la clase MotorGráfico, esto podemos modificarlo después.
-    #Grafico la señal
+    #::::::::::::::::::::::::::
+    #Métodos de visualización
+    #::::::::::::::::::::::::::
+
     def graficar_senal(self, mostrar=True):
-        if self.senal_actual is None: #verifico que tengamos una señal cargada
+        """
+        Grafica la señal biomédica actual.
+        La señal debe tener la forma: canales x muestras.
+        """
+        #Verificamos que exista una señal cargada
+        if self.senal_actual is None: 
             raise ValueError("No se encuentra una señal cargada")
-        
+        #Obtenemos los canales seleccionados
         if self.canales_visibles is not None:
             data = self.senal_actual.get_data(self.canales_visibles)
+        #Si no se especifican canales se grafican todos
         else:
             data = self.senal_actual.get_data()
-        #Si hay un intervalo seleccionado, lo aplico
+        #SAplicamos recorte temporal si existe
         if self.rango_tiempo is not None:
             inicio,fin = self.rango_tiempo
+            #Frecuencia de muestreo
             fs = self.senal_actual.info.frecuencia_muestreo
-           # inicio_muestra = int(inicio*fs)
-           # fin_muestra = int(fin*fs)
-            #recorto cada canal
-            #data = [canal[inicio_muestra:fin_muestra]for canal in data] voy a cambiar esto para usar numpy
-            data = data[:,int(inicio*fs):int(fin*fs)]
-        #for canal in data:    #esto lo puedo cambiar por algo diferente plt.plot(data.T) con .T cada canal se grafica como una línea
+            #Conversión de segundos a muestras
+            inicio_muestra = int(inicio*fs)
+            fin_muestra = int(fin*fs)
+            #Recorte temporal
+            data = data[:,inicio_muestra:fin_muestra]
+        
+        #Trasponemos la matriz para que matplotlib interprete cada canal como una línea independiente
         plt.plot(data.T)
 
-        #get_data() método de RawSignal, lo definimos en la clase RawSignal.Me sirve para obtener los datos de la señal 
         plt.title("Señal")
         plt.xlabel("Muestras")
         plt.ylabel("Amplitud")
 
-        if self.mostrar_anotaciones: #resalto eventos con el método resaltar_eventos que está más abajo?, está bien?, no estoy seguro.
+        #Mostramos eventos si corresponde
+        if self.mostrar_anotaciones:
             self.resaltar_eventos()
-
+        
+        #Mostramos 
         if mostrar:
             plt.show()
 
-    #Grafico épocas y época
     def graficar_epocas(self, mostrar = True):
-        if self.epocas is None: #verifico que haya épocas cargadas
+        """
+        Grafica todas las épocas disponibles.
+        """
+
+        #Verificamos que existan épocas
+        if self.epocas is None: 
             raise ValueError("No hay Épocas disponibles")
         
-        data = self.epocas.get_data() #obtengo los datos de las épocas
-        #recorremos las épocas con el for 
+        #Obtenemos las épocas
+        data = self.epocas.get_data() 
+        #Recorremos y graficamos cada época
         for i, epoca in enumerate(data):
             plt.plot(epoca.T)
             plt.title(f"Época{i}")
+            plt.xlabel("Muestras")
+            plt.ylabel("Amplitud")
+
             if mostrar:
                 plt.show()
         
-    def graficar_epoca(self, indice: int): #este método es para graficar CADA época
-        if self.epocas is None: #de nuevo, verifico que haya épocas
-            raise ValueError("No hay época cargada")
-        data = self.epocas.get_data() #obtengo las épocas
+    def graficar_epoca(self, indice: int): 
+        """
+        Grafica una época específica.
 
-        epoca = data[indice] #según el índice elijo la época que quiero
+        Parámetros
+        ----------
+        indice : int  #Índice de la época a visualizar
+        """
+        #Verificamos que existan épocas
+        if self.epocas is None: 
+            raise ValueError("No hay época cargada")
         
+        #Obtenemos todas las épocas
+        data = self.epocas.get_data() 
+
+        #Seleccionamos la época deseada
+        epoca = data[indice] 
+        #Graficamos
         plt.plot(epoca.T)
         
         plt.title(f"Época{indice}")
@@ -111,39 +134,73 @@ class MotorGrafico(): #creo la clase MotorGrafico
         plt.ylabel("Amplitud")
         plt.show()
     
-    #Resaltar eventos
+    #::::::::::::::::::::::::::::::::::
+    #Métodos de Eventos y Anotaciones
+    #::::::::::::::::::::::::::::::::::
+
     def resaltar_eventos(self):
-        #if self.senal_actual is None:
-         #   print("No hay señal cargada")
-          #  return
-        eventos = self.senal_actual.eventos #obtengo objeto evento de la señal
-
-        if eventos is None:
-            print("No hay eventos")
-            return
+        """
+        Muestra los eventos asociados a la señal mediante líneas verticales.
+        """
+        #Verificamos que exista señal
+        if self.senal_actual is None:
+            raise ValueError("No hay señal cargada")
         
-        lista_eventos = eventos.get_eventos()#obtenemos la lista de eventos usando el método get_eventos de la clase Eventos, la lista sería algo como: [(muestra,id_evento)...]
+        #Obtenemos objeto eventos
+        eventos = self.senal_actual.eventos
 
-        #Recorremos cada evento
+        #Verificamos que existan eventos
+        if eventos is None:
+            raise ValueError("No hay eventos asociados")
+        
+        #Lista de eventos : [(muestra, id_evento), ...]
+        lista_eventos = eventos.get_eventos()
+
+        #Recorremos eventos
         for evento in lista_eventos:
             muestra = evento[0] #posición de emuestr donde ocurre el evento
             id_evento = evento[1] #tipo de evento, identificador de el tipo de evento
 
-            plt.axvline(x = muestra, linestyle = "--") #dibujp una línea vertical en la posición del evento
-            plt.text(muestra, plt.ylim()[1], str(id_evento), rotation = 90) #etiquete con el id del evento
-    
+            #Dibujamos la línea vertical
+            plt.axvline(x = muestra, linestyle = "--") 
+            #Agrregamos una etiqueta
+            plt.text(muestra, plt.ylim()[1], str(id_evento), rotation = 90) 
+
+    #::::::::::::::::::::::::::
+    #Métodos de configuración
+    #::::::::::::::::::::::::::
+
     def seleccionar_intervalo(self, inicio : float, fin : float):
-        #Me combiene verificar que el intervalo sea válido
+        """
+        Define el intervalo temporal a visualizar.
+
+        Parámetros
+        ----------
+        inicio : float  #Timepo inicial en segundos
+        fin : float  #Tiempo final en segundos
+        """
+
+        #Verificamos que el intervalos ea válido
+        #Contrato:
+        #El inicio debe ser menor al fin
         if inicio >= fin:
-            raise ValueError("Intervalo incorrecto") #no es correcto pero no me sale la palabra, es que el inicio no puede ser mayor que el fin por eso es incorrecto.
-        self.rango_tiempo = (inicio,fin) #guardo el intervalo (¿el método seleccionar_intervalo y el de resaltar_eventos iría dentro de graficar_senal?)
+            raise ValueError("El inicio debe ser menor que el fin")
+        #Guardamos el intervalo
+        self.rango_tiempo = (inicio,fin)
         #NO OLVIDAR AGREGAR EL ATRIBUTO rango_tiempo EN EL DIAGRAMA UML DE LA CLASE MOTORGRAFICO
 
-    #método actulizar 
-    def actualizar(self): #limpio antes de graficar de nuevo
+    #:::::::::::::::::::::::::::::::::::::
+    #Métodos de Actualización y Limpieza
+    #:::::::::::::::::::::::::::::::::::::
+
+    def actualizar(self):
+        """
+        Actualiza la visualización actual.
+        """
+        #Limpiamos la figura anterior
         plt.clf()
 
-        #según el modo de visualización elijo que quiero graficar 
+        #El modo de visualización determina qué representación gráfica utilizar
         if self.modo_visualizacion == "señal":
             self.graficar_senal()
         
@@ -153,19 +210,34 @@ class MotorGrafico(): #creo la clase MotorGrafico
         else:
             raise ValueError("Modo de visualización incorrecto")
     
-    #método limpiar
     def limpiar(self):
+        """
+        Limpia la figura actual y reinicia el rango temporal.
+        """
+        #Limpiamos la figura
         plt.clf()
+        #Cerramos la ventana
+        plt.close() 
+        #Reiniciamos el intervalo 
+        self.rango_tiempo = None 
 
-        plt.close() #cierro la ventana del gráfico, esto es opcional, lo podemos quitar.
+    #::::::::::::::::::::::::
+    #Métodos de exportación
+    #::::::::::::::::::::::::
 
-        self.rango_tiempo = None #reseteo el intervalo seleccionado.
+    def guardar_imagen(self,path : str):
+        """
+        Guarda la visualización actual en disco.
 
-    #guardo la imagen
-    def guardar_imagen(self,path : str): #Verifico si hay algo para guardar 
+        Parámetros
+        ----------
+        path : str  #Ruta del archivo de salida
+        """
+        #Verificamos que exista algo para graficar
         if self.senal_actual is None and self.epocas is None:
             raise ValueError("No hay nada que graficar")
-        #genero el gráfico a partir del modo de visualizacion actual
+        
+        #Reutilizamos los métodos de graficación, para evitar duplicación lógica
         if self.modo_visualizacion == "señal":
             self.graficar_senal(mostrar=False)
         
@@ -175,25 +247,13 @@ class MotorGrafico(): #creo la clase MotorGrafico
         else:
             raise ValueError("Modo de visualización no válido")
         
-        #guardo la figura acutal en el archivo indicado
+        #Guardamos la figura
         plt.savefig(path)
 
-        #cierro la figura, es para liberar memoria por las dudas
+        #Cerramos la figura, es para liberar memoria por las dudas
         plt.close()
-
-# Crear objetos fake
-#raw = RawSignal()
-#epocas = Epocas()
-
-# Crear motor
-#motor = MotorGrafico(senal_actual=raw,epocas=epocas,modo_visualizacion="señal",canales_visibles=["C1", "C2"],mostrar_anotaciones=True,rango_tiempo=(0, 3))
-
-# Probar métodos
-#motor.graficar_senal()
-#motor.graficar_epocas()
-#motor.guardar_imagen("test2connumpy.png")
-            
-        #probar si grafica señales de 1xN, o 3xN etc, si es lo suficiente general
+   
+        #Probar si grafica señales de 1xN, o 3xN etc, si es lo suficiente general
 
 
         
