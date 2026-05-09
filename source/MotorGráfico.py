@@ -1,4 +1,4 @@
-#Clase MotorGráfico
+ #Clase MotorGráfico
 import matplotlib.pyplot as plt
 import numpy as np
 #import plotly.graph_objects as go, esta libreria tal vez la uso pero aún no se
