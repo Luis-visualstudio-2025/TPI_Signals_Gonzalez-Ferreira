@@ -1,4 +1,4 @@
-class Info_señal:                                                   # Definimos la clase info_señal para almacenar información relevante de las señales
+class Info:                                                         # Definimos la clase Info para almacenar información relevante de las señales
     def __init__(self, nombre_canales, tipos_canales, bad_channels, frecuencia_muestreo, duracion, info_experimento, info_experimentador, eventos, frecuencia_linea, frecuencias_corte, frecuencias_notch):         # Constructor que recibe toda la información relevante de las señales, como nombre de canales, tipos de canales, canales malos, frecuencia de muestreo, duración, información del experimento y experimentador, eventos, frecuencia de línea, frecuencias de corte y frecuencias del filtro Notch
         self.nombre_canales = nombre_canales                        # Asignamos el valor de nombre_canales al atributo de la instancia
         self.tipos_canales = tipos_canales                          # Asignamos el valor de tipos_canales al atributo de la instancia
