@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from Biosignals.Signals import RawSignal
 
 class ECGSignal(RawSignal):
     """

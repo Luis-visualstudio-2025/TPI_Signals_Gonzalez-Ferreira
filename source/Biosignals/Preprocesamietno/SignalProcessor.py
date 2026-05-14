@@ -1,8 +1,7 @@
 #Clase SignalProcessor
 
 import numpy as np
-
-from source.Biosignals.Signals.RawSignal import RawSignal
+from Biosignals.Signals.RawSignal import RawSignal
 
 #from source.RawSignal import RawSignal
 
@@ -89,7 +88,7 @@ class SignalProcessor:
         """
 
         #Frecuencia de muestreo
-        fs = self.signal.info.frecuancia_muestreo
+        fs = self.signal.info.frecuencia_muestreo
         #Frecuencia normalizada
         f0 = freq / fs
         #Coeficientes del filtro notch
