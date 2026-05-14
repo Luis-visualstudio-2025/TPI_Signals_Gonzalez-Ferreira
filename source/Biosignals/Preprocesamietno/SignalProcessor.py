@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from source.RawSignal import RawSignal
+from source.Biosignals.Signals.RawSignal import RawSignal
 
 #from source.RawSignal import RawSignal
 
