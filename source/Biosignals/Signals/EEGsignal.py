@@ -38,13 +38,14 @@ from Biosignals.Signals.RawSignal import RawSignal
 from Biosignals.Preprocesamiento.SignalProcessor import SignalProcessor
 from Biosignals.Preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
 from Biosignals.Epocas.Epocas import Epocas
+from Biosignals.Info.Info import Info
 
 class EEGSignal(RawSignal):
     """
     Clase para representar, analizar y procesar señales de EEG.
     Cumple con las especificaciones técnicas de la sección 4.3.2.
     """
-    def __init__(self, data, info, eventos, anotaciones, first_samp=0, 
+    def __init__(self, data, info: Info, eventos, anotaciones, first_samp=0, 
                  times=None, montage=None, ref_type='common', units='µV', 
                  subject_info=None, fecha=None):
         
@@ -53,6 +54,7 @@ class EEGSignal(RawSignal):
         super().__init__(info, eventos, anotaciones, data, first_samp)
         
         # 2. Atributos específicos del estándar 4.3.2
+        self.info.frecuencia_muestreo = info.frecuencia_muestreo # Aseguramos que la frecuencia de muestreo esté presente en info
         self.times = times if times is not None else np.arange(self.data.shape[1]) / self.info.frecuencia_muestreo
         self.montage = montage
         self.ref_type = ref_type
@@ -62,6 +64,7 @@ class EEGSignal(RawSignal):
         self.filtros_aplicados = []
         self.is_filtered = False
         self.is_trialed = False # Por defecto RawSignal es continua (2D)
+        
 
         # 3. Validaciones obligatorias del contrato
         self._validar_dimensiones_eeg()
@@ -94,14 +97,14 @@ class EEGSignal(RawSignal):
 
     def get_channels(self, names: list[str]):
         """Retorna una nueva instancia de EEGSignal con los canales seleccionados."""
-        indices = [self.info.nombres_canales.index(name) for name in names]
+        indices = [self.info.nombre_canales.index(name) for name in names]
         new_data = self.data[indices, :]
         
         # Creamos una copia profunda de info para modificar nombres/tipos sin afectar al padre
         import copy
         new_info = copy.deepcopy(self.info)
-        new_info.nombres_canales = [self.info.nombres_canales[i] for i in indices]
-        new_info.tipos_canales = [self.info.tipos_canales[i] for i in indices]
+        new_info.nombre_canales = [self.info.nombre_canales[i] for i in indices]
+        new_info.tipo_canales = [self.info.tipo_canales[i] for i in indices]
 
         return EEGSignal(new_data, new_info, self.eventos, self.anotaciones, 
                          self.first_samp, times=self.times, subject_info=self.subject_info)
@@ -154,7 +157,7 @@ class EEGSignal(RawSignal):
     def describe_eeg(self):
         """Características descriptivas avanzadas por canal."""
         stats = {}
-        for i, name in enumerate(self.info.nombres_canales):
+        for i, name in enumerate(self.info.nombre_canales):
             ch_data = self.data[i, :]
             stats[name] = {
                 "mean": np.mean(ch_data),
