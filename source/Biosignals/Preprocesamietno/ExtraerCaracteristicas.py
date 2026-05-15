@@ -9,8 +9,8 @@ class ExtraerCaracteristicas:
     Clase encargada de extraer métricas y transformadas de una señal.
     Trabaja con objetos de tipo RawSignal o derivados.
     """
-    raw=RawSignal() #Esto es solo para que no tire error, se debe pasar un objeto RawSignal al crear una instancia de ExtraerCaracteristicas
-    raw.get_data() #Esto es solo para que no tire error, se debe pasar un objeto RawSignal al crear una instancia de ExtraerCaracteristicas
+    #raw=RawSignal() #Esto es solo para que no tire error, se debe pasar un objeto RawSignal al crear una instancia de ExtraerCaracteristicas
+    #raw.get_data() #Esto es solo para que no tire error, se debe pasar un objeto RawSignal al crear una instancia de ExtraerCaracteristicas
     
     def __init__(self, signal):
         self.signal = signal

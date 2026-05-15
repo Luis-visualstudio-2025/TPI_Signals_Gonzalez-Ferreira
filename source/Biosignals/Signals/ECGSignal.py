@@ -2,7 +2,10 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Biosignals.Signals import RawSignal
+from Biosignals.Signals.RawSignal import RawSignal
+from Biosignals.Info.Info import Info
+from Biosignals.Eventos.Eventos import  Eventos
+from Biosignals.Eventos.Anotaciones import Anotaciones
 
 class ECGSignal(RawSignal):
     """
