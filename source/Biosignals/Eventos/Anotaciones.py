@@ -120,13 +120,19 @@ class Anotaciones:
         df.to_csv(filename, index=False)
     def load(self, filename):
         """
-        Cargamos anotaciones desde un archivo CSV.
+        Cargamos anotaciones desde un archivo .csv, .txt o .json.
         Parámetros
         ----------
-        filename : str  #Ruta del archivo CSV.
+        filename : str  #Ruta del archivo .csv, .txt o .json.
         """
-        #Leemos el CSV
-        df = pd.read_csv(filename)
+        #Leemos el .CSV, .txt o .json
+        if filename.endswith('.csv'):                       #Si es un archivo CSV, lo leemos con pandas
+            df = pd.read_csv(filename)                      
+        elif filename.endswith('.txt'):                     #Si es un archivo de texto, lo leemos con pandas usando tabulaciones como delimitadores
+            df = pd.read_csv(filename, delimiter='\t')
+        elif filename.endswith('.json'):                    ##Si es un archivo JSON, lo leemos con pandas usando el formato de registros
+            df = pd.read_json(filename, orient='records')
+
         #Recuperamos columnas
         self.onset = df['onset'].tolist()
         self.duration = df['duration'].tolist()
