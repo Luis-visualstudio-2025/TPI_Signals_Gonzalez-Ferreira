@@ -4,8 +4,7 @@ from Biosignals.Signals.RawSignal import RawSignal
 class Dataset:
 
     """
-    Representa un conjunto de señales biomédicas.La clase permite almacenar múltiples objetos
-    RawSignal o clases derivadas.
+    Representa un conjunto de señales biomédicas.La clase permite almacenar múltiples objetos RawSignal o clases derivadas.
 
     Puede utilizarse para: análisis masivo, entrenamiento de modelos, procesamiento por lotes, almacenamiento de señales.
     """

@@ -1,7 +1,8 @@
  #Clase MotorGráfico
 import matplotlib.pyplot as plt
 import numpy as np
-#import plotly.graph_objects as go, esta libreria tal vez la uso pero aún no se
+from Biosignals.Signals.RawSignal import RawSignal
+from Biosignals.Epocas.Epocas import Epocas
 
 """
 El motor gráfico deber ser independiente del tipo de señal biomédica.
