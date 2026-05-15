@@ -25,7 +25,7 @@ class ECGSignal(RawSignal):
         first_samp : int  #índice de la primera muestra
         """
         #Constructor de RawSignal
-        super().__init__(info,eventos,anotaciones.data,first_samp)
+        super().__init__(info,eventos,anotaciones,data,first_samp)
         #Atributos propios de ECG
         #Frecuencia cardíaca
         self.freq_cardiaca = None
@@ -176,7 +176,7 @@ class ECGSignal(RawSignal):
         print(f"Canales: {self.n_channels()}")
         print(f"Muestras: {self.n_samples()}")
 
-        print(f"Duración:" f"{self.duracion():.2f} segundos")
+        print(f"Duración:" f"{self.duration():.2f} segundos")
 
         if self.freq_cardiaca is not None:
             print(f"Frecuecnia cardíaca: "f"{self.freq_cardiaca:.2f} latidos por minuto")

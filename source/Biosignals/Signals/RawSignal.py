@@ -89,7 +89,7 @@ class RawSignal:
             return self.data
         
         #Obtenemos índices de canales seleccionados
-        indices = [self.info.nombres_canales.index(ch) for ch in picks]
+        indices = [self.info.nombre_canales.index(ch) for ch in picks]
         return self.data[indices]
     
     def __getitem__(self, item):
@@ -111,7 +111,7 @@ class RawSignal:
         """
         Retorna los canales seleccionados.
         """
-        indices = [self.info.nombres_canales.index(name)
+        indices = [self.info.nombre_canales.index(name)
                    for name in names]
         return self.data[indices]
   
@@ -121,7 +121,7 @@ class RawSignal:
         Elimina cnaales de la señal
         """
         #Obtenemos ínidces de canales a eliminar
-        indices = [self.info.nombres_canales.index(name)
+        indices = [self.info.nombre_canales.index(name)
                    for name in names]
         
         #Obtengo índices de canales a conservar
@@ -130,7 +130,7 @@ class RawSignal:
         #Actualizo datos
         self.data = self.data[keep]
         #Actualizo cnaales
-        self.info.nombres_canales = [self.info.nombres_canales[i] for i in keep]
+        self.info.nombre_canales = [self.info.nombre_canales[i] for i in keep]
 
     def picks_types(self, tipo : str):
         """
@@ -143,7 +143,7 @@ class RawSignal:
         self.data = self.data[indices]
 
         #Actulizo nombres de canales
-        self.info.nombres_canales = [self.info.nombres_canales[i] for i in indices]
+        self.info.nombre_canales = [self.info.nombre_canales[i] for i in indices]
 
         #Actualizo tipos de canales
         self.info.tipos_canales = [self.info.tipos_canales[i] for i in indices]
@@ -161,16 +161,12 @@ class RawSignal:
         tipo : str  #Tipo de filtro.
         ventana : int  #Tamaño de ventana del filtro.
         """
-
         #Filtro de media móvil
         if tipo == "media":
             #Kernel del filtro
             kernel = np.ones(ventana)/ventana
             #Aplico convolución a cada canal
-            self.data = np.array([
-                np.convolve(canal, kernel, mode = 'same')
-                for canal in self.data
-                ])
+            self.data = np.array([np.convolve(canal, kernel, mode = 'same') for canal in self.data])
 
     def crop(self, tmin: float, tmax : float):
         """
@@ -180,7 +176,6 @@ class RawSignal:
         #tmin debe ser menor que tmax
         if tmin >= tmax:
             raise ValueError("tmin deber ser menor que tmax")
-        
         #Frecuencia de muestreo
         fs = self.info.frecuencia_muestreo
         #Convierto segundos a muestras

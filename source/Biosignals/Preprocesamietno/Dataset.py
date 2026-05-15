@@ -116,30 +116,14 @@ class Dataset:
 
         print("Resumen Dataset")
         print("-------------------")
-
         print(f"Nombre: {self.name}")
-
         print(f"Cantidad señales: {len(self.signals)}")
-
         if len(self.signals) > 0:
-
-            print(
-                f"Canales primera señal: "
-                f"{self.signals[0].n_channels()}"
-            )
-
-            print(
-                f"Muestras primera señal: "
-                f"{self.signals[0].n_samples()}"
-            )
+            print(f"Canales primera señal: "f"{self.signals[0].n_channels()}")
+            print(f"Muestras primera señal: "f"{self.signals[0].n_samples()}")
 
     def __str__(self):
-
         """
         Representación textual.
         """
-
-        return (
-            f"Dataset: "
-            f"{len(self.signals)} señales"
-        )
+        return (f"Dataset: "f"{len(self.signals)} señales")

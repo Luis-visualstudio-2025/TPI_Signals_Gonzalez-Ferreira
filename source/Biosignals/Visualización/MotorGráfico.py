@@ -123,7 +123,7 @@ class MotorGrafico():
             raise ValueError("No hay época cargada")
         
         #Obtenemos todas las épocas
-        data = self.epocas.get_data() 
+        data = self.epocas.get_data_Epoc() 
 
         #Seleccionamos la época deseada
         epoca = data[indice] 
@@ -155,7 +155,7 @@ class MotorGrafico():
             raise ValueError("No hay eventos asociados")
         
         #Lista de eventos : [(muestra, id_evento), ...]
-        lista_eventos = eventos.get_eventos()
+        lista_eventos = eventos.get_events()
 
         #Recorremos eventos
         for evento in lista_eventos:
