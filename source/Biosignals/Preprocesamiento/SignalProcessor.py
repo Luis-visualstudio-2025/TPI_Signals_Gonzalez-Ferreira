@@ -2,6 +2,7 @@
 
 import numpy as np
 from Biosignals.Signals.RawSignal import RawSignal
+from Biosignals.Info.Info import Info 
 
 #from source.RawSignal import RawSignal
 
@@ -74,7 +75,7 @@ class SignalProcessor:
         
     def apply_notch(self, freq: float = 50):
         """
-        Filtro para frecuancia epecífica de 50Hz.
+        Filtro para frecuencia epecífica de 50Hz.
 
         Parámetros
         ----------

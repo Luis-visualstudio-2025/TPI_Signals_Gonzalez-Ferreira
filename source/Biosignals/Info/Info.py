@@ -43,7 +43,10 @@ class Info:                                                         # Definimos 
         if len(new_names) != len(self.nombre_canales):
             raise ValueError("La cantidad de nuevos nombres debe coincidir con la cantidad de canales.")
         self.nombre_canales = new_names
-
+    
+    # def frec_muestreo(self):                                           # Método para obtener la frecuencia de muestreo, retorna el valor de la frecuencia de muestreo presente en la señal. En este contexto, se muestra la frecuencia de muestreo que se ha establecido para la señal.
+    #     return self.frecuencia_muestreo
+    
 class Señal:                                                        # Definimos la clase señal para representar una señal con un nombre y una frecuencia específicos
     def __init__(self, nombre, frecuencia):
         self.nombre = nombre
