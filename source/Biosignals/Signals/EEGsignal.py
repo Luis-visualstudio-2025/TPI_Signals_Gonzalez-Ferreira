@@ -42,7 +42,6 @@ from Biosignals.Epocas.Epocas import Epocas
 class EEGSignal(RawSignal):
     """
     Clase para representar, analizar y procesar señales de EEG.
-    Cumple con las especificaciones técnicas de la sección 4.3.2.
     """
     def __init__(self, data, info, eventos, anotaciones, first_samp=0, 
                  times=None, montage=None, ref_type='common', units='µV', 
