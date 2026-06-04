@@ -1,10 +1,10 @@
 #Testeo de la clase RawSignal
 import pytest
 import numpy as np
-from source.Biosignals.Info.Info import Info
-from source.Biosignals.Eventos.Eventos import Eventos
-from source.Biosignals.Eventos.Anotaciones import Anotaciones
-from source.Biosignals.Signals.RawSignal import RawSignal
+from src.biosignals.info.Info import Info
+from src.biosignals.eventos.Eventos import Eventos
+from src.biosignals.eventos.Anotaciones import Anotaciones
+from src.biosignals.signals.RawSignal import RawSignal
 
 # ==========================================
 # FIXTURES (Configuración reutilizable)
