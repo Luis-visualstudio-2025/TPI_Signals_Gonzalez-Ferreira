@@ -1,5 +1,5 @@
 
-from Biosignals.Signals.RawSignal import RawSignal
+from src.biosignals.signals.RawSignal import RawSignal
 
 class Dataset:
 
