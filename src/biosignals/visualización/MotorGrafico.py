@@ -89,51 +89,94 @@ class MotorGrafico():
         if mostrar:
             plt.show()
 
-    def graficar_epocas(self, mostrar = True):
-        """
-        Grafica todas las épocas disponibles.
-        """
+    #:::::::::::::::::::::::::::::::
+    # Métodos de visualización: Épocas
+    #:::::::::::::::::::::::::::::::
 
-        #Verificamos que existan épocas
-        if self.epocas is None: 
-            raise ValueError("No hay Épocas disponibles")
+    def graficar_epocas(self, mostrar: bool = True):
+        """
+        Grafica todas las épocas disponibles una al lado de la otra (Subplots).
+        Cumple con el requerimiento de la Figura lado a lado del PDF.
+        """
+        if self.epocas is None or len(self.epocas) == 0: 
+            raise ValueError("No hay épocas disponibles para graficar.")
         
-        #Obtenemos las épocas
         data = self.epocas.get_data() 
-        #Recorremos y graficamos cada época
-        for i, epoca in enumerate(data):
-            plt.plot(epoca.T)
-            plt.title(f"Época{i}")
-            plt.xlabel("Muestras")
-            plt.ylabel("Amplitud")
+        num_epocas = len(data)
 
-            if mostrar:
-                plt.show()
+        # Creamos una figura con subplots lado a lado (1 fila, N columnas)
+        fig, axes = plt.subplots(1, num_epocas, figsize=(4 * num_epocas, 4), sharey=True)
         
-    def graficar_epoca(self, indice: int): 
-        """
-        Grafica una época específica.
+        # Si solo hay una época, axes no es un array, lo convertimos a lista para iterar
+        if num_epocas == 1:
+            axes = [axes]
 
-        Parámetros
-        ----------
-        indice : int  #Índice de la época a visualizar
-        """
-        #Verificamos que existan épocas
-        if self.epocas is None: 
-            raise ValueError("No hay época cargada")
+        for i, (epoca, ax) in enumerate(zip(data, axes)):
+            ax.plot(epoca.T)
+            ax.set_title(f"Época {i}")
+            ax.set_xlabel("Muestras")
+            if i == 0:
+                ax.set_ylabel("Amplitud") # Solo ponemos el label Y en el primer gráfico
         
-        #Obtenemos todas las épocas
-        data = self.epocas.get_data_Epoc() 
+        plt.tight_layout() # Ajusta los márgenes para que no se superpongan
+        
+        if mostrar:
+            plt.show()
+        
+    def graficar_epoca(self, indice: int, mostrar: bool = True): 
+        """
+        Grafica una época específica por su índice.
+        """
+        if self.epocas is None or len(self.epocas) == 0: 
+            raise ValueError("No hay épocas cargadas.")
+        
+        data = self.epocas.get_data() # Unificado a get_data()
 
-        #Seleccionamos la época deseada
+        if indice < 0 or indice >= len(data):
+            raise IndexError(f"El índice {indice} está fuera de rango. Hay {len(data)} épocas.")
+
         epoca = data[indice] 
-        #Graficamos
-        plt.plot(epoca.T)
         
-        plt.title(f"Época{indice}")
+        plt.figure(figsize=(8, 4))
+        plt.plot(epoca.T)
+        plt.title(f"Época {indice}")
         plt.xlabel("Muestras")
         plt.ylabel("Amplitud")
-        plt.show()
+        
+        if mostrar:
+            plt.show()
+
+    def graficar_tiempo_frecuencia_epocas(self, indices_epocas: list[int] = None, mostrar: bool = True):
+        """
+        Grafica la representación en tiempo-frecuencia para una o más épocas.
+        Cumple con el requisito del PDF: cada época en una NUEVA ventana.
+        """
+        if self.epocas is None or len(self.epocas) == 0: 
+            raise ValueError("No hay épocas cargadas.")
+
+        # Solicitamos la matriz de tiempo-frecuencia ya calculada a la clase Epocas
+        espectro = self.epocas.tiempo_frecuencia()
+        
+        # Si no se pasan índices, graficamos todas
+        indices = indices_epocas if indices_epocas is not None else range(len(self.epocas))
+
+        for i in indices:
+            if i >= len(self.epocas):
+                continue
+            
+            # plt.figure() asegura que cada época se abra en una ventana nueva independiente
+            plt.figure(figsize=(8, 4)) 
+            
+            # Espectrograma simple usando imshow
+            plt.imshow(espectro[i, 0].reshape(1, -1), aspect='auto', cmap='viridis')
+            
+            plt.title(f"Tiempo-Frecuencia - Época {i}")
+            plt.xlabel("Frecuencia (Bins)")
+            plt.ylabel("Amplitud (FFT)")
+            plt.colorbar(label='Magnitud')
+            
+        if mostrar:
+            plt.show()
     
     #::::::::::::::::::::::::::::::::::
     #Métodos de Eventos y Anotaciones
