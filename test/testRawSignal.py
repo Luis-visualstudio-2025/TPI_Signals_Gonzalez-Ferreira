@@ -148,3 +148,9 @@ def test_str_representation(raw_signal):
     texto = str(raw_signal)
     assert "RawSignal" in texto
     assert "3 canales" in texto
+
+
+if __name__ == "__main__":
+    # Esto le dice a pytest que ejecute este archivo específico 
+    # mostrando los detalles (-v) y permitiendo ver los prints (-s)
+    pytest.main(["-v", "-s", __file__])
