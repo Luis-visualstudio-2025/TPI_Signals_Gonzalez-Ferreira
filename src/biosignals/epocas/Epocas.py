@@ -3,8 +3,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from biosignals.signals.RawSignal import RawSignal
-from biosignals.eventos.Eventos import Eventos
+from src.biosignals.signals.RawSignal import RawSignal
+from src.biosignals.eventos.Eventos import Eventos
 
 
 class Epocas:

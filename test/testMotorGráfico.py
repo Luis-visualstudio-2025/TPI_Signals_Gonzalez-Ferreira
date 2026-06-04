@@ -6,11 +6,11 @@ import matplotlib
 #sin abrir ventanas
 matplotlib.use("Agg")
 
-from biosignals.visualización.MotorGrafico import MotorGrafico
-from biosignals.signals.RawSignal import RawSignal
-from biosignals.info.Info import Info
-from biosignals.eventos.Eventos import Eventos
-from biosignals.eventos.Anotaciones import Anotaciones
+from src.biosignals.visualización.MotorGrafico import MotorGrafico
+from src.biosignals.signals.RawSignal import RawSignal
+from src.biosignals.info.Info import Info
+from src.biosignals.eventos.Eventos import Eventos
+from src.biosignals.eventos.Anotaciones import Anotaciones
 
 #fixture es una señal de pruebas reutilizable
 

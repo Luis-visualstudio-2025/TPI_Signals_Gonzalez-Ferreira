@@ -2,9 +2,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from biosignals.info import Info
-from biosignals.eventos import Eventos
-from biosignals.eventos import Anotaciones
+from src.biosignals.info.Info import Info
+from src.biosignals.eventos.Eventos import Eventos
+from src.biosignals.eventos.Anotaciones import Anotaciones
 
 class RawSignal:
     

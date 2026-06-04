@@ -2,10 +2,10 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from biosignals.signals import RawSignal
-from biosignals.info.Info import Info
-from biosignals.eventos.Eventos import  Eventos
-from biosignals.eventos.Anotaciones import Anotaciones
+from src.biosignals.signals import RawSignal
+from src.biosignals.info.Info import Info
+from src.biosignals.eventos.Eventos import  Eventos
+from src.biosignals.eventos.Anotaciones import Anotaciones
 
 class EMGSignal(RawSignal):
     """

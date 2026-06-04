@@ -1,8 +1,8 @@
 #Clase SignalProcessor
 
 import numpy as np
-from biosignals.signals.RawSignal import RawSignal
-from biosignals.info.Info import Info 
+from src.biosignals.signals.RawSignal import RawSignal
+from src.biosignals.info.Info import Info 
 
 #from source.RawSignal import RawSignal
 
