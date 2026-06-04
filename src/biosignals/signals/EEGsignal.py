@@ -34,11 +34,11 @@
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
-from Biosignals.Signals.RawSignal import RawSignal
-from Biosignals.Preprocesamiento.SignalProcessor import SignalProcessor
-from Biosignals.Preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
-from Biosignals.Epocas.Epocas import Epocas
-from Biosignals.Info.Info import Info
+from biosignals.signals.RawSignal import RawSignal
+from biosignals.preprocesamiento.SignalProcessor import SignalProcessor
+from biosignals.preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
+from biosignals.epocas.Epocas import Epocas
+from biosignals.info.Info import Info
 
 class EEGSignal(RawSignal):
     """

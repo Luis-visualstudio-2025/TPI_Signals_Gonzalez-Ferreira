@@ -1,8 +1,8 @@
  #Clase MotorGráfico
 import matplotlib.pyplot as plt
 import numpy as np
-from Biosignals.Signals.RawSignal import RawSignal
-from Biosignals.Epocas.Epocas import Epocas
+from biosignals.signals.RawSignal import RawSignal
+from biosignals.epocas.Epocas import Epocas
 
 """
 El motor gráfico deber ser independiente del tipo de señal biomédica.

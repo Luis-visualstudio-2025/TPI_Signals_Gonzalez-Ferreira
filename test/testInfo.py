@@ -1,6 +1,6 @@
 #Testeo de la clase Info
 
-from source.Biosignals.Info.Info import Info
+from src.biosignals.info.Info import Info
 
 """
 Definimos una función de prueba para la clase Info:

@@ -2,7 +2,7 @@
 # Esta clase se basa en la clase RawSignal y ofrece métodos para calcular métricas estadísticas, transformadas de Hilbert, espectrogramas y transformadas de Fourier.
 import numpy as np
 from scipy.signal import hilbert, spectrogram
-from Biosignals.Signals.RawSignal import RawSignal
+from biosignals.signals.RawSignal import RawSignal
 
 class ExtraerCaracteristicas:
     """
