@@ -103,10 +103,9 @@ class EEGSignal(RawSignal):
         import copy
         new_info = copy.deepcopy(self.info)
         new_info.nombre_canales = [self.info.nombre_canales[i] for i in indices]
-        new_info.tipo_canales = [self.info.tipo_canales[i] for i in indices]
+        new_info.tipos_canales = [self.info.tipos_canales[i] for i in indices]
 
-        return EEGSignal(new_data, new_info, self.eventos, self.anotaciones, 
-                         self.first_samp, times=self.times, subject_info=self.subject_info)
+        return EEGSignal(new_data, new_info, self.eventos, self.anotaciones, self.first_samp, times=self.times, subject_info=self.subject_info)
 
     def crop(self, tmin: float, tmax: float):
         """Retorna una nueva instancia de EEGSignal recortada temporalmente."""
@@ -118,8 +117,7 @@ class EEGSignal(RawSignal):
         new_times = self.times[inicio:fin]
         new_first_samp = self.first_samp + inicio
 
-        return EEGSignal(new_data, self.info, self.eventos, self.anotaciones, 
-                         new_first_samp, times=new_times, subject_info=self.subject_info)
+        return EEGSignal(new_data, self.info, self.eventos, self.anotaciones, new_first_samp, times=new_times, subject_info=self.subject_info)
 
     # --- PROCESAMIENTO USANDO SignalProcessor ---
 

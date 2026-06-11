@@ -1,13 +1,9 @@
 #Clase Épocas
-
-# Clase Épocas
-
 import numpy as np
 from typing import Union, List, Dict, Optional      # Importaciones de tipos para validación y anotaciones
 
 from src.biosignals.signals.RawSignal import RawSignal
 from src.biosignals.eventos.Eventos import Eventos
-
 
 class Epocas:
     """
@@ -15,7 +11,6 @@ class Epocas:
     Cada época corresponde a un intervalo temporal alrededor de un evento.
     Forma de datos: (epocas x canales x muestras)
     """
-
     def __init__(
         self, 
         signal: RawSignal, 
@@ -25,8 +20,7 @@ class Epocas:
         tmax: float = 0.5, 
         picks: Union[str, List[str], None] = None,
         reject: Optional[Dict[str, float]] = None,
-        _precomputed_data: Optional[np.ndarray] = None
-    ):
+        _precomputed_data: Optional[np.ndarray] = None):
         # Validación defensiva de tipos obligatorios
         if not isinstance(signal, RawSignal):
             raise TypeError("El parámetro 'signal' debe ser una instancia o heredar de RawSignal.")
@@ -99,7 +93,7 @@ class Epocas:
             return False
         
         # Identificamos los canales evaluados en esta época
-        canales_evaluados = self.picks if self.picks else self.signal.info.nombres_canales
+        canales_evaluados = self.picks if self.picks else self.signal.info.nombre_canales
         
         for idx, ch_name in enumerate(canales_evaluados):
             ch_name_lower = ch_name.lower()
@@ -139,7 +133,7 @@ class Epocas:
             # Indexación selectiva por picks si aplica
             if self.picks is not None:
                 try:
-                    indices = [self.signal.info.nombres_canales.index(ch) for ch in self.picks]
+                    indices = [self.signal.info.nombre_canales.index(ch) for ch in self.picks]
                     epoca = epoca[indices]
                 except ValueError as e:
                     raise ValueError(f"Uno de los canales especificados en 'picks' no existe: {e}")
@@ -205,7 +199,7 @@ class Epocas:
             return
             
         try:
-            canales_actuales = self.picks if self.picks else self.signal.info.nombres_canales
+            canales_actuales = self.picks if self.picks else self.signal.info.nombre_canales
             indices_eliminar = [canales_actuales.index(ch) for ch in canales]
         except ValueError as e:
             raise ValueError(f"Imposible eliminar canales no existentes en el conjunto: {e}")

@@ -46,22 +46,16 @@ class ECGSignal(RawSignal):
     def detectar_picos(self, umbral: float):
         """
         Detecta picos R mediante umbral.
-        
         Parámetros
         ----------
-        
         umbral : float  #Umbral mínimo de amplitud
-        
-        Returns
+        Retorna
         -------
-        
         np.ndarray  #Índices de muestras donde hay picos
         """
         #Usamos el primer canal
         señal = self.data[0]
-
         picos = []
-
         #Recorremos evitando extremos
         for i in range(1, len(señal) - 1):
             #Máximo local + umbral
@@ -74,13 +68,10 @@ class ECGSignal(RawSignal):
     def calcular_intervalos_rr(self):
         """
         Calcula intervalos RR en segundos.
-        
-        Returns
+        Retorna
         -------
-        
         np.ndarray  #Intervalos RR
         """
-
         #Verificamos que eisten picos
         if self.picos is None:
             raise ValueError("No se han detectado picos")
@@ -94,10 +85,8 @@ class ECGSignal(RawSignal):
     def calcular_freq_cardiaca(self):
         """
         Calcula la frecuecnia cardíaca a partir de intervalos RR:
-        
-        Returns
+        Retorna
         -------
-        
         float  #Frecuencia cardíaca en latidos por minuto
         """ 
         #Verificamos RR
@@ -110,16 +99,12 @@ class ECGSignal(RawSignal):
     def detectar_arritmias(self, rr_min: float = 0.6, rr_max: float = 1.2):
         """
         Detecta psoibles arritmias simples.
-        
         Parámetros
         ----------
-        
         rr_min : float  #Intervalo RR mínimo normal
         rr_max : float  #Intervalo RR máximo normal
-        
-        Returns
+        Retorna
         -------
-        
         np.ndarray  #Índices de intervalos normales.
         """
         #Verificamos RR
@@ -138,7 +123,6 @@ class ECGSignal(RawSignal):
         """
         Grafica la señal de ECG
         """
-        
         plt.plot(self.data[0])
         plt.title("Señal ECG")
         plt.xlabel("Muestras")
@@ -149,14 +133,12 @@ class ECGSignal(RawSignal):
         """
         Grafica señal ECG con picos detectasdos
         """
-
         #Verifico que existan picos
         if self.picos is None:
             raise ValueError("No se han detectado picos")
         
         señal = self.data[0]
         plt.plot(señal)
-
         #Marcamos los picos
         plt.plot(self.picos, señal[self.picos], 'ro')
         plt.title("ECG con picos R detectados")
@@ -172,7 +154,6 @@ class ECGSignal(RawSignal):
         """
         Muestra información resumida de la señal ECG
         """
-
         print("Resumen de la señal ECG")
         print("-------------------------")
 
@@ -191,4 +172,4 @@ class ECGSignal(RawSignal):
         """
         Representación textual del objeto ECGSignal
         """
-        return (f"ECGSignal: " f"{self.n_channels()} canales, "f"{self.n_samples()} muestras, "f"duración {self.duracion():.2f} segundos")
+        return (f"ECGSignal: " f"{self.n_channels()} canales, "f"{self.n_samples()} muestras, "f"duración {self.duration():.2f} segundos")
