@@ -48,7 +48,7 @@ class ExtraerCaracteristicas:
         Calcula la representación Tiempo-Frecuencia para un canal específico.
         """
         # Obtenemos los datos del canal solicitado
-        data = self.signal.get_channels([ch_name])[0] # Tomamos el primer (y único) canal
+        data = self.signal.get_data(picks = [ch_name])[0] # Tomamos el primer (y único) canal
         fs = self.signal.info.frecuencia_muestreo
         
         # Calculamos el espectrograma (Tiempo-Frecuencia)

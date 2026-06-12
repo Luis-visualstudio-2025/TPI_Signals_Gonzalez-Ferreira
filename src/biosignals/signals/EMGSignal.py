@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from src.biosignals.signals import RawSignal
+from src.biosignals.signals.RawSignal import RawSignal
 from src.biosignals.info.Info import Info
 from src.biosignals.eventos.Eventos import  Eventos
 from src.biosignals.eventos.Anotaciones import Anotaciones
@@ -81,7 +81,7 @@ class EMGSignal(RawSignal):
         np.ndarray  #Matriz booleana indicando activación (True) o no activación (False) para cada canal y muestra.
         """
         #Detectamos muestras cuya amplitud supera el umbral
-        self.activacion_muscular = (self.data > umbral)
+        self.activacion_muscular = np.abs(self.data) > umbral
         return self.activacion_muscular
 
     #::::::::::::::::::::::::::
@@ -120,8 +120,9 @@ class EMGSignal(RawSignal):
         
         #Mostramos RMS si existe
         if self.valor_rms is not None:
-            for i, rms in enumerate(self.valor_rms):
-                print(f"Canal {i+1}: {rms:.4f}")
+            print("RMS por canal: ")
+            for nombre, rms in zip(self.info.nombre_canales,self.valor_rms):
+                print(f"{nombre}: {rms:.4f}")
             
     def __str__(self):
         """
@@ -129,4 +130,5 @@ class EMGSignal(RawSignal):
         """
         return (f"EMGSignal : " f"{self.n_channels()} canales," f"{self.n_samples()} muestras, "f"duración {self.duration():.2f} s")
     
+
     

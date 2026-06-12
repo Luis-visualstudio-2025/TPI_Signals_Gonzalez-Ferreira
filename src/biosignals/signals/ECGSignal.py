@@ -76,6 +76,9 @@ class ECGSignal(RawSignal):
         if self.picos is None:
             raise ValueError("No se han detectado picos")
 
+        if len(self.picos) < 2:
+            raise ValueError("Se necesitan al menos 2 picos para calcular RR")
+        
         fs = self.info.frecuencia_muestreo
 
         #Diferencia entre picos consecutivos
@@ -92,6 +95,8 @@ class ECGSignal(RawSignal):
         #Verificamos RR
         if self.intervalos_rr is None:
             raise ValueError("No se han calculado intervalos RR")
+        if len(self.intervalos_rr) == 0:
+            raise ValueError("No hay intervalos RR válidos")
         rr_promedio = np.mean(self.intervalos_rr)
         self.freq_cardiaca = 60 / rr_promedio
         return self.freq_cardiaca

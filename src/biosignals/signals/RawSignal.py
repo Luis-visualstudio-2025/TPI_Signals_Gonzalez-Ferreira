@@ -35,9 +35,14 @@ class RawSignal:
         
         if first_samp < 0:
             raise ValueError("first_samp no puede ser negativo")
+        if not isinstance(info,Info):
+            raise TypeError("info debe ser un objeto Info")
+        if not isinstance(eventos, Eventos):
+            raise TypeError("eventos debe ser un objeto Eventos")
+        if not isinstance(anotaciones, Anotaciones):
+            raise TypeError("anotaciones debe ser un objeto Anotaciones")
         
         #Guardamos atributos del objeto
-        
         self.info = info #contiene datos
         self.eventos = eventos #objeto eventos
         self.anotaciones = anotaciones #objeto anotaciones
@@ -164,6 +169,8 @@ class RawSignal:
             kernel = np.ones(ventana)/ventana
             #Aplico convolución a cada canal
             self.data = np.array([np.convolve(canal, kernel, mode = 'same') for canal in self.data])
+        else:
+            raise ValueError(f"Filtro {tipo} no soportado")
 
     def crop(self, tmin: float, tmax : float):
         """
@@ -186,6 +193,7 @@ class RawSignal:
         self.data = self.data[:, inicio:fin]
         #Actualizo la primera muestra
         self.first_samp += inicio
+        #self.info.set_duration(self.n_samples/fs), este depende de si en Info está set_duration()
 
     #::::::::::::::::::::::::
     #Métodos de anotaciones
