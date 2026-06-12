@@ -1,3 +1,5 @@
+from scr.biosignals.preprocesamiento.Dataset import Dataset
+
 class Info:                                                         # Definimos la clase Info para almacenar información relevante de las señales
     def __init__(self, nombre_canales, tipos_canales, bad_channels, frecuencia_muestreo, duracion, info_experimento, info_experimentador, eventos, frecuencia_linea, frecuencias_corte, frecuencias_notch):         # Constructor que recibe toda la información relevante de las señales, como nombre de canales, tipos de canales, canales malos, frecuencia de muestreo, duración, información del experimento y experimentador, eventos, frecuencia de línea, frecuencias de corte y frecuencias del filtro Notch
         self.nombre_canales = nombre_canales                        # Asignamos el valor de nombre_canales al atributo de la instancia
@@ -47,30 +49,3 @@ class Info:                                                         # Definimos 
     # def frec_muestreo(self):                                           # Método para obtener la frecuencia de muestreo, retorna el valor de la frecuencia de muestreo presente en la señal. En este contexto, se muestra la frecuencia de muestreo que se ha establecido para la señal.
     #     return self.frecuencia_muestreo
     
-class Señal:                                                        # Definimos la clase señal para representar una señal con un nombre y una frecuencia específicos
-    def __init__(self, nombre, frecuencia):
-        self.nombre = nombre
-        self.frecuencia = frecuencia
-
-    def __str__(self):
-        return f"Señal: {self.nombre}, Frecuencia: {self.frecuencia} Hz"
-    
-    def __repr__(self):
-        return f"Señal(nombre='{self.nombre}', frecuencia={self.frecuencia})"
-    def __eq__(self, other):
-        if isinstance(other, Señal):
-            return self.nombre == other.nombre and self.frecuencia == other.frecuencia
-        return False
-    def __hash__(self):
-        return hash((self.nombre, self.frecuencia))
-    def __contains__(self, item):
-        return item in self.nombre
-    def __getitem__(self, key):
-        if key == 'nombre':
-            return self.nombre
-        elif key == 'frecuencia':
-            return self.frecuencia
-        else:
-            raise KeyError(f"Clave '{key}' no encontrada en la señal.")
-    def __len__(self):
-        return len(self.nombre)

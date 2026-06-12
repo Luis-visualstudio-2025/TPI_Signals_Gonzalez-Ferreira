@@ -69,7 +69,7 @@ class EEGSignal(RawSignal):
         self._validar_dimensiones_eeg()
         self._validar_consistencia_temporal()
 
-    # --- MÉTODOS DE VALIDACIÓN ---
+    # MÉTODOS DE VALIDACIÓN
 
     def _validar_dimensiones_eeg(self):
         """Valida dimensiones 2D/3D y consistencia con el vector de tiempos."""
@@ -92,7 +92,7 @@ class EEGSignal(RawSignal):
                 warnings.warn(f"WARNING: El intervalo temporal entre muestras ({dt_real:.6f}s) "
                               f"no coincide con la frecuencia de muestreo ({self.info.frecuencia_muestreo}Hz).")
 
-    # --- MÉTODOS QUE RETORNAN NUEVAS INSTANCIAS (INMUTABILIDAD) ---
+    # MÉTODOS QUE RETORNAN NUEVAS INSTANCIAS (INMUTABILIDAD)
 
     def get_channels(self, names: list[str]):
         """Retorna una nueva instancia de EEGSignal con los canales seleccionados."""
@@ -121,7 +121,7 @@ class EEGSignal(RawSignal):
         return EEGSignal(new_data, self.info, self.eventos, self.anotaciones, 
                          new_first_samp, times=new_times, subject_info=self.subject_info)
 
-    # --- PROCESAMIENTO USANDO SignalProcessor ---
+    # PROCESAMIENTO USANDO SignalProcessor 
 
     def apply_filter_eeg(self, l_freq=None, h_freq=None):
         """
@@ -142,7 +142,7 @@ class EEGSignal(RawSignal):
         self.is_filtered = True
         return self
 
-    # --- INTEGRACIÓN CON CLASE EPOCAS ---
+    # INTEGRACIÓN CON CLASE EPOCAS 
 
     def get_epochs(self, tmin=-0.2, tmax=0.5):
         """
@@ -151,7 +151,7 @@ class EEGSignal(RawSignal):
         # Aquí se pasaría self.eventos.mapeo si existiera esa estructura en tu clase Eventos
         return Epocas(signal=self, eventos=self.eventos, tmin=tmin, tmax=tmax)
 
-    # --- MÉTODOS DE ANÁLISIS ---
+    # MÉTODOS DE ANÁLISIS
 
     def describe_eeg(self):
         """Características descriptivas avanzadas por canal."""
