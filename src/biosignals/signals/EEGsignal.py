@@ -87,7 +87,7 @@ class EEGSignal(RawSignal):
         new_times = self.times[inicio:fin]
         new_first_samp = self.first_samp + inicio
         new_info = copy.deepcopy(self.info)
-        return EEGSignal(new_info, self.info, self.eventos, self.anotaciones, new_data, new_first_samp, times=new_times, subject_info=self.subject_info)
+        return EEGSignal(new_info, self.eventos, self.anotaciones, new_data, new_first_samp, times=new_times, subject_info=self.subject_info)
 
     # --- PROCESAMIENTO USANDO SignalProcessor ---
 
@@ -109,8 +109,8 @@ class EEGSignal(RawSignal):
         
         new_info = copy.deepcopy(self.info)
             
-        self.data = temp_signal.data
-        self.is_filtered = True
+        #self.data = temp_signal.data
+        #self.is_filtered = True
         return EEGSignal(new_info, self.eventos, self.anotaciones, temp_signal.data,  self.first_samp, times=self.times, montage=self.montage,ref_type=self.ref_type,units=self.units,subject_info=self.subject_info,fecha=self.fecha)
 
     # --- INTEGRACIÓN CON CLASE EPOCAS ---
