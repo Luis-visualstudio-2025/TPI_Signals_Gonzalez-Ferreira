@@ -13,7 +13,7 @@ class Epocas:
     Cada época corresponde a un intervalo temporal alrededor de un evento.
     Forma de datos: (epocas x canales x muestras)
     """
-
+    
     def __init__(
         self, 
         signal: RawSignal, 
