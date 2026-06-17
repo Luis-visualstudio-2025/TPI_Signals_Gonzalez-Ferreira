@@ -1,53 +1,164 @@
-from typing import List, Dict, Any, Optional, Union
-import os
-from src.biosignals.preprocesamiento.Dataset import Dataset
+#Clase Info
+from typing import List, Optional
 
-class Info:                                                         # Definimos la clase Info para almacenar información relevante de las señales
-    def __init__(self, nombre_canales, tipos_canales, bad_channels, frecuencia_muestreo, duracion, info_experimento, info_experimentador, eventos, frecuencia_linea, frecuencias_corte, frecuencias_notch):         # Constructor que recibe toda la información relevante de las señales, como nombre de canales, tipos de canales, canales malos, frecuencia de muestreo, duración, información del experimento y experimentador, eventos, frecuencia de línea, frecuencias de corte y frecuencias del filtro Notch
-        self.nombre_canales = nombre_canales                        # Asignamos el valor de nombre_canales al atributo de la instancia
-        self.tipos_canales = tipos_canales                          # Asignamos el valor de tipos_canales al atributo de la instancia
-        self.bad_channels = bad_channels                            # Asignamos el valor de bad_channels al atributo de la instancia
-        self.frecuencia_muestreo = frecuencia_muestreo              # Asignamos el valor de frecuencia_muestreo al atributo de la instancia
-        self.duracion = duracion                                    # Asignamos el valor de duracion al atributo de la instancia
-        self.info_experimento = info_experimento                    # Asignamos el valor de info_experimento al atributo de la instancia
-        self.info_experimentador = info_experimentador              # Asignamos el valor de info_experimentador al atributo de la instancia
-        self.eventos = eventos                                      # Asignamos el valor de eventos al atributo de la instancia     
-        self.frecuencia_linea = frecuencia_linea                    # Asignamos el valor de frecuencia_linea al atributo de la instancia
-        self.frecuencias_corte = frecuencias_corte                  # Asignamos el valor de frecuencias_corte al atributo de la instancia
-        self.frecuencias_notch = frecuencias_notch                  # Asignamos el valor de frecuencias_notch al atributo de la instancia
+class Info:
+    """
+    Clase para almacenar metadata de una señal biomédica.
+    Contiene información sobre canales, frecuencia de muestreo,
+    duración, filtros aplicados y datos experimentales.
+    """
+    def __init__(
+        self,
+        frecuencia_muestreo: float,
+        nombre_canales: List[str],
+        tipos_canales: List[str],
+        bad_channels: Optional[List[str]] = None,
+        duracion: Optional[float] = None,
+        info_experimento: Optional[str] = None,
+        info_experimentador: Optional[str] = None,
+        eventos=None,
+        frecuencia_linea: Optional[float] = 50,
+        frecuencias_corte: Optional[List[float]] = None,
+        frecuencias_notch: Optional[List[float]] = None
+    ):
+        """
+        Inicializa un objeto Info.
 
-    def __contains__(self, item):                                   # Método para verificar si un item está presente en el nombre de canales, retorna True si el item está presente y False si no lo está. En este contexto, la clave sería el nombre de un canal u otra información. Ej: çh_namesïn info
+        Parámetros
+        ----------
+        frecuencia_muestreo : float
+            Frecuencia de muestreo de la señal.
+
+        nombre_canales : list[str]
+            Lista con nombres de canales.
+
+        tipos_canales : list[str]
+            Lista con tipos de canales.
+
+        bad_channels : list[str], opcional
+            Lista de canales defectuosos.
+
+        duracion : float, opcional
+            Duración total de la señal.
+
+        info_experimento : str, opcional
+            Información sobre el experimento.
+
+        info_experimentador : str, opcional
+            Información del experimentador.
+
+        eventos : Eventos, opcional
+            Eventos asociados a la señal.
+
+        frecuencia_linea : float, opcional
+            Frecuencia de línea eléctrica (default 50 Hz).
+
+        frecuencias_corte : list[float], opcional
+            Frecuencias de corte de filtros.
+
+        frecuencias_notch : list[float], opcional
+            Frecuencias de filtros notch.
+        """
+
+        #contratos mínimos
+        if frecuencia_muestreo <= 0:
+            raise ValueError("La frecuencia de muestreo debe ser positiva.")
+
+        if len(nombre_canales) != len(tipos_canales):
+            raise ValueError("nombre_canales y tipos_canales deben tener la misma longitud.")
+        #asignación de atributos
+        self.frecuencia_muestreo = frecuencia_muestreo
+        self.nombre_canales = nombre_canales
+        self.tipos_canales = tipos_canales
+        self.bad_channels = bad_channels if bad_channels is not None else []
+        self.duracion = duracion
+        self.info_experimento = info_experimento
+        self.info_experimentador = info_experimentador
+        self.eventos = eventos
+        self.frecuencia_linea = frecuencia_linea
+        self.frecuencias_corte = (frecuencias_corte if frecuencias_corte is not None else [])
+        self.frecuencias_notch = (frecuencias_notch if frecuencias_notch is not None else [])
+
+    #métodos
+    def __contains__(self, item):
+        """
+        Permite verificar si un canal existe.
+        Ejemplo:
+        --------
+        "C3" in info
+        """
         return item in self.nombre_canales
 
-    def __getitem__(self, key):                                     # Método para obtener el valor de un atributo específico usando la sintaxis de acceso a elementos, retorna el valor del atributo correspondiente a la clave proporcionada. En este contexto, la clave sería el nombre de un canal u otra información. Ej: info['ch_names'] para obtener el nombre de los canales
-        return getattr(self, key)           
+    def __getitem__(self, key):
+        """
+        Permite acceder a atributos como diccionario.
+        Ejemplo:
+        --------
+        info["nombre_canales"]
+        """
+        return getattr(self, key)
 
-    def __len__(self):                                              # Método para obtener la cantidad de canales, retorna el número de canales presentes en la señal. En este contexto, se asume que el número de canales se determina por la longitud de la lista de nombres de canales.
+    def __len__(self):
+        """
+        Retorna la cantidad de canales.
+        """
         return len(self.nombre_canales)
 
     def __str__(self):
-        return f"Info de la señal: {len(self.nombre_canales)} canales, duración: {self.duracion} segundos"   # Método para obtener una representación en forma de cadena de la información de la señal, retorna una cadena que describe la información de la señal, incluyendo el número de canales y la duración. En este contexto, se muestra el número de canales y la duración de la señal.
+        """
+        Representación textual del objeto.
+        """
+        return (
+            f"Info: {len(self.nombre_canales)} canales, "
+            f"fs={self.frecuencia_muestreo} Hz, "
+            f"duración={self.duracion if self.duracion else 'No definida'} s")
 
-    def get(self, key):                                             # Método para obtener el valor de un atributo específico usando la sintaxis de acceso a elementos, retorna el valor del atributo correspondiente a la clave proporcionada. En este contexto, la clave sería el nombre de un canal u otra información. Ej: info.get('ch_names') para obtener el nombre de los canales
+    #métodos tipo diccionario
+    def get(self, key):
+        """
+        Obtiene un atributo por nombre.
+        """
         return getattr(self, key)
 
-    def keys(self):                                                 # Método para obtener las claves de los atributos de la clase, retorna una lista de las claves de los atributos presentes en la clase. En este contexto, se mostrarían las claves de los atributos relacionados con la información de la señal, como nombre de canales, tipos de canales, etc.
+    def keys(self):
+        """
+        Retorna las claves disponibles.
+        """
         return vars(self).keys()
 
-    def items(self):                                                # Método para obtener los pares clave-valor de los atributos de la clase, retorna una lista de tuplas donde cada tupla contiene una clave y su valor correspondiente. En este contexto, se mostrarían los pares clave-valor de los atributos relacionados con la información de la señal, como nombre de canales, tipos de canales, etc.
+    def items(self):
+        """
+        Retorna pares clave-valor.
+        """
         return vars(self).items()
 
-    def n_channels(self):                                           # Método para obtener la cantidad de canales, retorna el número de canales presentes en la señal. En este contexto, se asume que el número de canales se determina por la longitud de la lista de nombres de canales.
+    #métodos informativos
+
+    def n_channels(self):
+        """
+        Retorna cantidad de canales.
+        """
         return len(self.nombre_canales)
 
-    def n_samples(self):                                            # Método para obtener la cantidad de muestras, retorna el número total de muestras presentes en la señal. En este contexto, se calcula multiplicando la frecuencia de muestreo por la duración de la señal, lo que da como resultado el número total de muestras presentes en la señal. 
+    def n_samples(self):
+        """
+        Calcula número total de muestras.
+        """
+        if self.duracion is None:
+            raise ValueError("La duración no está definida.")
         return int(self.frecuencia_muestreo * self.duracion)
 
-    def rename_channels(self, new_names):                           # Método para renombrar los canales, recibe una lista de nuevos nombres y actualiza el atributo de nombre de canales con los nuevos nombres proporcionados. En este contexto, se espera que la cantidad de nuevos nombres coincida con la cantidad de canales presentes en la señal, por lo que se verifica esta condición antes de actualizar el atributo. Si la cantidad de nuevos nombres no coincide con la cantidad de canales, se lanza un error.
+    def frec_muestreo(self):
+        """
+        Retorna frecuencia de muestreo.
+        """
+        return self.frecuencia_muestreo
+    
+    #métodos de modificación
+    def rename_channels(self, new_names: List[str]):
+        """
+        Renombra canales.
+        """
         if len(new_names) != len(self.nombre_canales):
             raise ValueError("La cantidad de nuevos nombres debe coincidir con la cantidad de canales.")
         self.nombre_canales = new_names
-    
-    def frec_muestreo(self):                                           # Método para obtener la frecuencia de muestreo, retorna el valor de la frecuencia de muestreo presente en la señal. En este contexto, se muestra la frecuencia de muestreo que se ha establecido para la señal.
-         return self.frecuencia_muestreo
-    

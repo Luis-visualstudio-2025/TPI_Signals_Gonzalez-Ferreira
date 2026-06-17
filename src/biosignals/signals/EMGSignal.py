@@ -60,11 +60,14 @@ class EMGSignal(RawSignal):
         -------
         np.ndarray  #Envolvente calculada para cada canal.
         """
+        if ventana <= 0:
+            raise ValueError("ventan debe ser mayor a cero")
 
         #Rectificación de la señal
         rectificada = np.abs(self.data)
         #Kernel de media móvil
         kernel = np.ones(ventana) / ventana
+       
 
         #Aplicamos convolución canal por canal para obtener la envolvente suavizada
         self.envolvente = np.array([np.convolve(canal, kernel, mode='same') for canal in rectificada])
@@ -80,6 +83,8 @@ class EMGSignal(RawSignal):
         -------
         np.ndarray  #Matriz booleana indicando activación (True) o no activación (False) para cada canal y muestra.
         """
+        if not isinstance(umbral, (int, float)):
+            raise TypeError("umbral debe ser numérico")
         #Detectamos muestras cuya amplitud supera el umbral
         self.activacion_muscular = np.abs(self.data) > umbral
         return self.activacion_muscular

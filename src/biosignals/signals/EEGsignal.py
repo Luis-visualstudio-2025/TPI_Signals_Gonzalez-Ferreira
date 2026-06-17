@@ -7,18 +7,20 @@ from src.biosignals.preprocesamiento.SignalProcessor import SignalProcessor
 from src.biosignals.preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
 from src.biosignals.epocas.Epocas import Epocas
 from src.biosignals.info.Info import Info
+from src.biosignals.eventos.Eventos import  Eventos
+from src.biosignals.eventos.Anotaciones import Anotaciones
 
 class EEGSignal(RawSignal):
     """
     Clase para representar, analizar y procesar señales de EEG.
     """
-    def _init_(self,info: Info, eventos, anotaciones,data: np.ndarray, first_samp=0, 
+    def __init__(self,info: Info, eventos: Eventos, anotaciones: Anotaciones,data: np.ndarray, first_samp=0, 
                  times=None, montage=None, ref_type='common', units='µV', 
                  subject_info=None, fecha=None):
         
         # 1. Llamada al constructor de la clase base (RawSignal)
         # RawSignal ya valida que data sea 2D y first_samp >= 0
-        super()._init_(info, eventos, anotaciones, data, first_samp)
+        super().__init__(info, eventos, anotaciones, data, first_samp)
         
         # 2. Atributos específicos del estándar 4.3.2
         self.info.frecuencia_muestreo = info.frecuencia_muestreo # Aseguramos que la frecuencia de muestreo esté presente en info
@@ -67,6 +69,9 @@ class EEGSignal(RawSignal):
     def picks_channels(self, names: list[str]):
         #"""Retorna una nueva instancia de EEGSignal con los canales seleccionados."""
         import copy
+        for name in names:
+            if name not in self.info.nombre_canales:
+                raise ValueError(f"Canal {name} no existe")
         indices = [self.info.nombre_canales.index(name)
                    for name in names]
         new_data = self.data[indices, :]
@@ -79,6 +84,13 @@ class EEGSignal(RawSignal):
     def crop(self, tmin: float, tmax: float):
         """Retorna una nueva instancia de EEGSignal recortada temporalmente."""
         import copy
+        if tmin <= tmax:
+            raise ValueError("tmin debe ser menor que tmax")
+        if tmin <0:
+            raise ValueError("tmin ni puede ser negativo")
+        if tmax > self.duration():
+            raise ValueError("tmax excede la duración")
+        
         fs = self.info.frecuencia_muestreo
         inicio = int(tmin * fs)
         fin = int(tmax * fs)
@@ -186,5 +198,5 @@ class EEGSignal(RawSignal):
         plt.xlim(0, self.info.frecuencia_muestreo / 2) # Límite de Nyquist
         plt.show()
 
-    def _str_(self):
+    def __str__(self):
         return(f"EEGSignal: "f"{self.n_channels()} canales, "f"{self.n_samples()} muestras, "f"fs={self.info.frecuencia_muestreo} Hz")

@@ -126,7 +126,14 @@ class Eventos:
         filename : str  #Nombre del archivo CSV.
         """
         df = self.get_events()
-        df.to_csv(filename, index=False)
+        if filename.endswith(".csv"):
+            df.to_csv(filename, index=False)
+        elif filename.endswith(".txt"):
+            df.to_csv(filename, sep="\t", index=False)
+        elif filename.endswith(".json"):
+            df.to_json(filename, orient="records", indent=4)
+        else:
+            raise ValueError("Formato no soportado. Use .csv, .txt o .json")
 
     @classmethod    
     def load(cls, filename):
