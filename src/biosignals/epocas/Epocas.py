@@ -1,9 +1,11 @@
 #Clase Épocas
+
 import numpy as np
 from typing import Union, List, Dict, Optional      # Importaciones de tipos para validación y anotaciones
 
 from src.biosignals.signals.RawSignal import RawSignal
 from src.biosignals.eventos.Eventos import Eventos
+
 
 class Epocas:
     """
@@ -11,6 +13,7 @@ class Epocas:
     Cada época corresponde a un intervalo temporal alrededor de un evento.
     Forma de datos: (epocas x canales x muestras)
     """
+
     def __init__(
         self, 
         signal: RawSignal, 
