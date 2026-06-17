@@ -57,7 +57,7 @@ class Dataset:
     def description(self) -> str:
         return self._description
 
-    @description.setter                # Setter para la descripción del dataset, valida que el valor sea una cadena de texto (str) antes de asignarlo al atributo privado _description. Si el valor no es una cadena, se lanza un error de tipo (TypeError).
+    @description.setter               # Setter para la descripción del dataset, valida que el valor sea una cadena de texto (str) antes de asignarlo al atributo privado _description. Si el valor no es una cadena, se lanza un error de tipo (TypeError).
     def description(self, value: str) -> None:
         if not isinstance(value, str):
             raise TypeError("La descripción debe ser una cadena de texto (str).")
@@ -77,7 +77,7 @@ class Dataset:
                 raise TypeError("Todos los elementos de la lista deben ser instancias de RawSignal.")
         self._signals = value
 
-    @property               # Propiedad para la información del dataset, permite obtener y establecer la información con validación de tipo.
+    @property             # Propiedad para la información del dataset, permite obtener y establecer la información con validación de tipo.
     def info(self) -> Any:
         return self._info
 
@@ -86,66 +86,16 @@ class Dataset:
         # Aquí idealmente haríamos isinstance(value, Info), pero usamos Any para desacoplar
         self._info = value
     
-## Metodo para cargar señales desde archivos .txt, .csv, .npy 
-    @staticmethod
-    def carga_de_señal(ruta_archivo: str) -> Dict[str, Any]:
-        """
-        Lee un archivo físico de señal (.txt, .csv, .npy) y extrae sus datos numéricos 
-        junto con metadatos básicos. Retorna un diccionario consumible por Info o RawSignal.
-        """
-        if not isinstance(ruta_archivo, str):
-            raise TypeError("La ruta del archivo debe ser un string.")
-        
-        if not os.path.exists(ruta_archivo):
-            raise FileNotFoundError(f"No se pudo localizar el archivo en: {ruta_archivo}")
-
-        # Extraemos la extensión en minúsculas
-        _, extension = os.path.splitext(ruta_archivo)
-        extension = extension.lower()
-
-        try:
-            # Carga dependiendo del formato
-            if extension == '.npy':
-                datos = np.load(ruta_archivo)
-            elif extension == '.csv':
-                # delimiter=',' es estándar para CSV
-                datos = np.loadtxt(ruta_archivo, delimiter=',')
-            elif extension == '.txt':
-                # loadtxt asume espacios/tabulaciones por defecto
-                datos = np.loadtxt(ruta_archivo)
-            else:
-                raise ValueError(f"Formato no soportado ('{extension}'). Use .npy, .csv o .txt.")
-
-            # Estandarización de dimensiones a 2D (Canales x Muestras)
-            if datos.ndim == 1:
-                # Si es un array plano, asumimos que es 1 solo canal
-                datos = datos.reshape(1, -1)
-            elif datos.ndim > 2:
-                raise ValueError("El archivo contiene matrices de más de 2 dimensiones, formato inválido para señales.")
-
-            n_canales, n_muestras = datos.shape
-
-            # Armamos el diccionario de respuesta (compatible con la clase Info previa)
-            return {
-                "datos_crudos": datos,               # La matriz numérica de Numpy
-                "ch_names": [f"CH_{i+1}" for i in range(n_canales)],
-                "sfreq": 250.0,                      # Frecuencia simulada/default si el archivo puro no la incluye
-                "n_channels": n_canales,
-                "duracion": float(n_muestras / 250.0) 
-            }
-
-        except Exception as e:
-            raise RuntimeError(f"Ocurrió un error al intentar decodificar el archivo '{ruta_archivo}': {str(e)}") 
 
     # Métodos
    
     def add_signal(self, signal: RawSignal) -> None:
-        """Agrega una señal al dataset validando su tipo."""
-        "Parámetros"
-        """signal : RawSignal  #Señal a agregar."""
-        if not isinstance(signal, RawSignal):
+        """Agrega una señal al dataset validando su tipo de forma segura."""
+        # Validamos usando el nombre de la clase para evitar conflictos de importación en entornos de pruebas
+        if type(signal).__name__ != 'RawSignal' and not isinstance(signal, RawSignal):
             raise TypeError("El objeto a agregar debe ser una instancia de RawSignal.")
-        self._signals.append(signal)
+        
+        self.signals.append(signal)
 
     def remove_signal(self, index: int)-> None:
 
@@ -199,7 +149,7 @@ class Dataset:
         dataset[0]
         """
 
-        return self.get_signal[index]
+        return self.get_signal(index)
 
     def __len__(self) -> int:
 
@@ -236,4 +186,3 @@ class Dataset:
             except Exception:
                 pass
         print("===============================")
-        
