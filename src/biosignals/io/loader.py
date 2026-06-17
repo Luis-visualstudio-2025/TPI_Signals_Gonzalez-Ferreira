@@ -117,3 +117,4 @@ def load_signal(file_path: str, signal_class: type = RawSignal, fs: float = 250.
         data=data, 
         first_samp=kwargs.get('first_samp', 0)          # Si el usuario no especifica el primer sample, asumimos que es 0 por defecto
     )
+
