@@ -84,7 +84,7 @@ class EEGSignal(RawSignal):
     def crop(self, tmin: float, tmax: float):
         """Retorna una nueva instancia de EEGSignal recortada temporalmente."""
         import copy
-        if tmin <= tmax:
+        if tmin >= tmax:
             raise ValueError("tmin debe ser menor que tmax")
         if tmin <0:
             raise ValueError("tmin ni puede ser negativo")
