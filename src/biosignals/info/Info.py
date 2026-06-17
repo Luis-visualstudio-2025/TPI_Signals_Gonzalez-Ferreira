@@ -1,4 +1,6 @@
-from scr.biosignals.preprocesamiento.Dataset import Dataset
+from typing import List, Dict, Any, Optional, Union
+import os
+from src.biosignals.preprocesamiento.Dataset import Dataset
 
 class Info:                                                         # Definimos la clase Info para almacenar información relevante de las señales
     def __init__(self, nombre_canales, tipos_canales, bad_channels, frecuencia_muestreo, duracion, info_experimento, info_experimentador, eventos, frecuencia_linea, frecuencias_corte, frecuencias_notch):         # Constructor que recibe toda la información relevante de las señales, como nombre de canales, tipos de canales, canales malos, frecuencia de muestreo, duración, información del experimento y experimentador, eventos, frecuencia de línea, frecuencias de corte y frecuencias del filtro Notch
@@ -46,6 +48,6 @@ class Info:                                                         # Definimos 
             raise ValueError("La cantidad de nuevos nombres debe coincidir con la cantidad de canales.")
         self.nombre_canales = new_names
     
-    # def frec_muestreo(self):                                           # Método para obtener la frecuencia de muestreo, retorna el valor de la frecuencia de muestreo presente en la señal. En este contexto, se muestra la frecuencia de muestreo que se ha establecido para la señal.
-    #     return self.frecuencia_muestreo
+    def frec_muestreo(self):                                           # Método para obtener la frecuencia de muestreo, retorna el valor de la frecuencia de muestreo presente en la señal. En este contexto, se muestra la frecuencia de muestreo que se ha establecido para la señal.
+         return self.frecuencia_muestreo
     
