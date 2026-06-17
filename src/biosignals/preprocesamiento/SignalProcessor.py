@@ -33,10 +33,10 @@ class SignalProcessor:
         -------
         Nueva señal filtrada
         """
-        #Kernel de media móvil
-        kernel = np.ones(ventana) / ventana
         if ventana <= 0:
             raise ValueError("ventana debe ser positiva")
+        #Kernel de media móvil
+        kernel = np.ones(ventana) / ventana
         #Filtrado por canal
         filtrada = np.array([np.convolve(canal, kernel, mode = 'same') for canal in self.signal.data])
         nueva_info = copy.deepcopy(self.signal.info)
@@ -104,10 +104,15 @@ class SignalProcessor:
         -------
         Señal normalizada
         """
+        import copy
         data = self.signal.data
         minimo = np.min(data, axis=1, keepdims=True)
         maximo = np.max(data, axis=1, keepdims=True)
-        normalizada = (data - minimo) / (maximo - minimo)
+        rango = maximo - minimo
+        rango[rango == 0] = 1.0 #donde el rango es 0, lo cambiamos a 1 para evitar dividir por cero. Matemáticamente, si el canal es plano, (data - minimo) será 0.
+                                #Y dividir 0 entre 1 nos da 0
+              
+        normalizada = (data - minimo) / rango
         nueva_info = copy.deepcopy(self.signal.info)
         return self.signal.__class__(info=nueva_info, eventos=self.signal.eventos, anotaciones=self.signal.anotaciones,data=normalizada,first_samp=self.signal.first_samp)
     

@@ -6,6 +6,7 @@ from src.biosignals.info.Info import Info
 from src.biosignals.eventos.Eventos import Eventos
 from src.biosignals.eventos.Anotaciones import Anotaciones
 
+
 class RawSignal:
     
     """
