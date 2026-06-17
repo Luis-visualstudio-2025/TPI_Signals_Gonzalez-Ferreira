@@ -35,9 +35,14 @@ class RawSignal:
         
         if first_samp < 0:
             raise ValueError("first_samp no puede ser negativo")
+        if not isinstance(info,Info):
+            raise TypeError("info debe ser un objeto Info")
+        if not isinstance(eventos, Eventos):
+            raise TypeError("eventos debe ser un objeto Eventos")
+        if not isinstance(anotaciones, Anotaciones):
+            raise TypeError("anotaciones debe ser un objeto Anotaciones")
         
         #Guardamos atributos del objeto
-        
         self.info = info #contiene datos
         self.eventos = eventos #objeto eventos
         self.anotaciones = anotaciones #objeto anotaciones
@@ -121,30 +126,27 @@ class RawSignal:
         Elimina cnaales de la señal
         """
         #Obtenemos ínidces de canales a eliminar
-        indices = [self.info.nombre_canales.index(name)
-                   for name in names]
-        
+        indices = [self.info.nombre_canales.index(name) for name in names]
         #Obtengo índices de canales a conservar
         keep = [i for i in range(self.n_channels()) if i not in indices]
-
         #Actualizo datos
         self.data = self.data[keep]
-        #Actualizo cnaales
+        #Actualizo canales
         self.info.nombre_canales = [self.info.nombre_canales[i] for i in keep]
+        self.info.tipos_canales = [self.info.tipos_canales[i] for i in keep]
 
     def picks_types(self, tipo : str):
         """
-        Seleccona canales según su tipo
+        Conserva únicamente los canales del tipo indicado.
         """
-        indices = [i for i, t in enumerate(self.info.tipos_canales)
-                   if t == tipo]
-        
+        indices = [i for i, t in enumerate(self.info.tipos_canales) if t == tipo]
+
+        if len(indices) == 0:
+            raise ValueError(f"No existen canales del tipo {tipo}")
         #Actualizo datos
         self.data = self.data[indices]
-
         #Actulizo nombres de canales
         self.info.nombre_canales = [self.info.nombre_canales[i] for i in indices]
-
         #Actualizo tipos de canales
         self.info.tipos_canales = [self.info.tipos_canales[i] for i in indices]
 
@@ -167,6 +169,8 @@ class RawSignal:
             kernel = np.ones(ventana)/ventana
             #Aplico convolución a cada canal
             self.data = np.array([np.convolve(canal, kernel, mode = 'same') for canal in self.data])
+        else:
+            raise ValueError(f"Filtro {tipo} no soportado")
 
     def crop(self, tmin: float, tmax : float):
         """
@@ -176,6 +180,10 @@ class RawSignal:
         #tmin debe ser menor que tmax
         if tmin >= tmax:
             raise ValueError("tmin deber ser menor que tmax")
+        if tmin < 0:
+            raise ValueError("tmin debe ser mayor a cero.")
+        if tmax > self.duration():
+            raise ValueError("tmax no puede ser mayor que la duración de la señal")
         #Frecuencia de muestreo
         fs = self.info.frecuencia_muestreo
         #Convierto segundos a muestras
@@ -185,6 +193,7 @@ class RawSignal:
         self.data = self.data[:, inicio:fin]
         #Actualizo la primera muestra
         self.first_samp += inicio
+        #self.info.set_duration(self.n_samples/fs), este depende de si en Info está set_duration()
 
     #::::::::::::::::::::::::
     #Métodos de anotaciones
@@ -207,7 +216,7 @@ class RawSignal:
         #Obtengo los datos seleccionados
         data = self.get_data(picks)
         #Grafico canales
-        plt.plot(self.data.T)
+        plt.plot(data.T)
         plt.title("Raw Signal")
         plt.xlabel("Muestraas")
         plt.ylabel("Amplitud")
@@ -221,7 +230,7 @@ class RawSignal:
         """"
         Retorna información resumida de la señal
         """
-        return{"n_canales": self.n_channels(), "n_muestras": self.n_samples(), "duración": self.duration(),"fs":self.info.frecuencia_muestreo}
+        return{"n_canales": self.n_channels(), "n_muestras": self.n_samples(), "duracion": self.duration(),"fs":self.info.frecuencia_muestreo}
     
     def resumen(self):
         """
@@ -239,11 +248,6 @@ class RawSignal:
         """
         return (f"RawSignal : {self.n_channels()} canales, {self.n_samples()} muestras, duración {self.duration():.2f} s")
     
-
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-#Fin de RawSignal (de momento)                                                                                                                                                                                                                                                                                                                       ::
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   
-
 
 
 

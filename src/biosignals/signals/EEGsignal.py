@@ -1,36 +1,4 @@
-#### El siguiente codigo comentado es el ejemplo de Lucas para la clase EEGSignal, 
-#### se basa en la clase RawSignal y ofrece métodos específicos para señales EEG, como la transformada de Hilbert. 
-#### Se importan las funciones necesarias de scipy.signal y se hereda de RawSignal para mantener la estructura común de las señales.
-
-
-# from fede.signals import RawSignal
-# from fede.signals import ExtractorCaracteristicas
-# from scipy.signal import hilbert
-
-# class EEGSignal(RawSignal):
-#     """
-#     Clase especializada para representar señales EEG.
-#     Hereda de RawSignal y puede incluir métodos específicos para EEG.
-#     """
-
-#     def __init__(self, data, info):
-#         super().__init__(data, info)
-#         self.hilbert = None  # Atributo para almacenar la transformada de Hilbert de la señal EEG
-#         #Aquí podríamos agregar atributos específicos para EEG si es necesario
-
-#     def getHilbert(self):
-#         """
-#         Método para obtener la transformada de Hilbert de la señal EEG.
-#         Retorna la señal transformada utilizando la función hilbert de scipy.
-#         """
-#         self.hilbert = hilbert(self.data, axis=1)
-#         return self.hilbert
-    
-
-# eeg = EEG()
-# _ = eeg.getHilbert()
-# eeg.
-
+#Clase EEGSignal
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
@@ -44,13 +12,13 @@ class EEGSignal(RawSignal):
     """
     Clase para representar, analizar y procesar señales de EEG.
     """
-    def __init__(self, data, info: Info, eventos, anotaciones, first_samp=0, 
+    def _init_(self,info: Info, eventos, anotaciones,data: np.ndarray, first_samp=0, 
                  times=None, montage=None, ref_type='common', units='µV', 
                  subject_info=None, fecha=None):
         
         # 1. Llamada al constructor de la clase base (RawSignal)
         # RawSignal ya valida que data sea 2D y first_samp >= 0
-        super().__init__(info, eventos, anotaciones, data, first_samp)
+        super()._init_(info, eventos, anotaciones, data, first_samp)
         
         # 2. Atributos específicos del estándar 4.3.2
         self.info.frecuencia_muestreo = info.frecuencia_muestreo # Aseguramos que la frecuencia de muestreo esté presente en info
@@ -69,13 +37,15 @@ class EEGSignal(RawSignal):
         self._validar_dimensiones_eeg()
         self._validar_consistencia_temporal()
 
-    # MÉTODOS DE VALIDACIÓN
+    # --- MÉTODOS DE VALIDACIÓN ---
 
     def _validar_dimensiones_eeg(self):
         """Valida dimensiones 2D/3D y consistencia con el vector de tiempos."""
         # Validación de rango de datos (2D o 3D según el estándar)
-        if self.data.ndim not in [2, 3]:
-            raise ValueError(f"Error: Los datos deben ser 2D o 3D. Se recibió: {self.data.ndim}D")
+        if self.data.ndim != 2:
+            raise ValueError("EEGSignal debe contener datos continuos 2D (canales x muestras)")
+        if len(self.times) != self.data.shape[1]:
+            raise ValueError("El vector temporal no coincide con las muestras")
         
         # Validación: Longitud de tiempos == Longitud de muestras
         n_muestras = self.data.shape[-1]
@@ -92,24 +62,23 @@ class EEGSignal(RawSignal):
                 warnings.warn(f"WARNING: El intervalo temporal entre muestras ({dt_real:.6f}s) "
                               f"no coincide con la frecuencia de muestreo ({self.info.frecuencia_muestreo}Hz).")
 
-    # MÉTODOS QUE RETORNAN NUEVAS INSTANCIAS (INMUTABILIDAD)
-
-    def get_channels(self, names: list[str]):
-        """Retorna una nueva instancia de EEGSignal con los canales seleccionados."""
-        indices = [self.info.nombre_canales.index(name) for name in names]
-        new_data = self.data[indices, :]
-        
-        # Creamos una copia profunda de info para modificar nombres/tipos sin afectar al padre
+    # --- MÉTODOS QUE RETORNAN NUEVAS INSTANCIAS (INMUTABILIDAD) ---
+   
+    def picks_channels(self, names: list[str]):
+        #"""Retorna una nueva instancia de EEGSignal con los canales seleccionados."""
         import copy
+        indices = [self.info.nombre_canales.index(name)
+                   for name in names]
+        new_data = self.data[indices, :]
         new_info = copy.deepcopy(self.info)
         new_info.nombre_canales = [self.info.nombre_canales[i] for i in indices]
-        new_info.tipo_canales = [self.info.tipo_canales[i] for i in indices]
+        new_info.tipos_canales = [self.info.tipos_canales[i] for i in indices]
 
-        return EEGSignal(new_data, new_info, self.eventos, self.anotaciones, 
-                         self.first_samp, times=self.times, subject_info=self.subject_info)
+        return EEGSignal(new_info, self.eventos, self.anotaciones, new_data, self.first_samp, times=self.times, subject_info=self.subject_info)
 
     def crop(self, tmin: float, tmax: float):
         """Retorna una nueva instancia de EEGSignal recortada temporalmente."""
+        import copy
         fs = self.info.frecuencia_muestreo
         inicio = int(tmin * fs)
         fin = int(tmax * fs)
@@ -117,16 +86,16 @@ class EEGSignal(RawSignal):
         new_data = self.data[:, inicio:fin]
         new_times = self.times[inicio:fin]
         new_first_samp = self.first_samp + inicio
+        new_info = copy.deepcopy(self.info)
+        return EEGSignal(new_info, self.eventos, self.anotaciones, new_data, new_first_samp, times=new_times, subject_info=self.subject_info)
 
-        return EEGSignal(new_data, self.info, self.eventos, self.anotaciones, 
-                         new_first_samp, times=new_times, subject_info=self.subject_info)
-
-    # PROCESAMIENTO USANDO SignalProcessor 
+    # --- PROCESAMIENTO USANDO SignalProcessor ---
 
     def apply_filter_eeg(self, l_freq=None, h_freq=None):
         """
         Aplica filtros usando el motor de SignalProcessor.
         """
+        import copy
         processor = SignalProcessor(self)
         temp_signal = self
         
@@ -137,21 +106,23 @@ class EEGSignal(RawSignal):
         if h_freq:
             temp_signal = processor.apply_lowpass(ventana=int(self.info.frecuencia_muestreo/h_freq))
             self.filtros_aplicados.append({'type': 'lowpass', 'freq': h_freq})
+        
+        new_info = copy.deepcopy(self.info)
             
-        self.data = temp_signal.data
-        self.is_filtered = True
-        return self
+        #self.data = temp_signal.data
+        #self.is_filtered = True
+        return EEGSignal(new_info, self.eventos, self.anotaciones, temp_signal.data,  self.first_samp, times=self.times, montage=self.montage,ref_type=self.ref_type,units=self.units,subject_info=self.subject_info,fecha=self.fecha)
 
-    # INTEGRACIÓN CON CLASE EPOCAS 
+    # --- INTEGRACIÓN CON CLASE EPOCAS ---
 
-    def get_epochs(self, tmin=-0.2, tmax=0.5):
+    def get_epochs(self, id_eventos = None, tmin=-0.2, tmax=0.5):
         """
         Segmenta la señal y retorna una instancia de la clase Epocas.
         """
         # Aquí se pasaría self.eventos.mapeo si existiera esa estructura en tu clase Eventos
-        return Epocas(signal=self, eventos=self.eventos, tmin=tmin, tmax=tmax)
+        return Epocas(signal=self, eventos=self.eventos,id_eventos= id_eventos, tmin=tmin, tmax=tmax)
 
-    # MÉTODOS DE ANÁLISIS
+    # --- MÉTODOS DE ANÁLISIS ---
 
     def describe_eeg(self):
         """Características descriptivas avanzadas por canal."""
@@ -194,7 +165,7 @@ class EEGSignal(RawSignal):
         
         plt.figure(figsize=(10, 5))
         # Graficamos el sobre (envelope) sobre la señal original (opcionalmente)
-        plt.plot(self.times, envelope.T)
+        plt.plot(self.times[:envelope.shape[1]],envelope.T)
         plt.title("Transformada de Hilbert (Envolvente de Amplitud)")
         plt.xlabel("Tiempo [seg]")
         plt.ylabel("Amplitud")
@@ -214,3 +185,6 @@ class EEGSignal(RawSignal):
         plt.ylabel("Amplitud")
         plt.xlim(0, self.info.frecuencia_muestreo / 2) # Límite de Nyquist
         plt.show()
+
+    def _str_(self):
+        return(f"EEGSignal: "f"{self.n_channels()} canales, "f"{self.n_samples()} muestras, "f"fs={self.info.frecuencia_muestreo} Hz")

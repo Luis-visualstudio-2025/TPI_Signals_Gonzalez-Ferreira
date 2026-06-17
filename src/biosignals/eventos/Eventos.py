@@ -8,7 +8,7 @@ class Eventos:
     Cada evento se represente como una tupla (muestra, id_evento).
     """
 
-    def __init__(self, eventos):
+    def __init__(self, eventos, mapeo=None):
         """
         Inicializamos un objeto Eventos.
         Parámetros
@@ -22,6 +22,9 @@ class Eventos:
                 raise ValueError("Cada evento debe ser una tupla (muestra, id_evento)")
         #Lista de eventos
         self.eventos = eventos
+        if mapeo is None:
+            mapeo = {}
+        self.mapeo = mapeo
     
     #Métodos
     def __iter__(self):

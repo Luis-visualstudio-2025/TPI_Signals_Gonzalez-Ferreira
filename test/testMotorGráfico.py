@@ -1,5 +1,5 @@
 #Testeo de la clase MotorGráfico
-
+#Este test es para verificar que el objeto se cree correctamente, que se pueden graficar señales de 1xN, 3xN, que se pueden seleccionar intervalos válidos, que se detectan intervalos inválidos, que se detecta la ausencia de señal al graficar y que se detecta un modo de visualización inválido.
 import pytest
 import numpy as np
 import matplotlib
@@ -62,6 +62,8 @@ def test_init(raw_signal_monocanal):
     motor = MotorGrafico(senal_actual=raw_signal_monocanal,epocas=None,modo_visualizacion="señal",canales_visibles=None,mostrar_anotaciones=False,rango_tiempo=None)
     print(f"MotorGráfico inicializado con modo_visualizacion: {motor.modo_visualizacion}")
     assert motor.modo_visualizacion == "señal"
+    assert motor.senal_actual is not None
+    assert motor.mostrar_anotaciones is False
 
 def test_graficar_monocanal(raw_signal_monocanal):
     print("\nProbando graficar señal monocanal")
@@ -75,6 +77,20 @@ def test_graficar_3canales(raw_signal_3canales):
     motor = MotorGrafico(raw_signal_3canales,None,"señal",None,False,None)
     motor.graficar_senal(mostrar=False)
     print("Gráfico de 3 canales generado correctamente")
+    assert True
+
+def test_graficar_8canales(raw_signal_8canales):
+    print("\nProbando graficar señal de 8 canales")
+    motor = MotorGrafico(raw_signal_8canales,None,"señal",None,False,None)
+    motor.graficar_senal(mostrar=False)
+    print("Gráfico de 8 canales generado correctamente")
+    assert True
+
+def test_graficar_32canales(raw_signal_32canales):
+    print("\nProbando graficar señal de 32 canales")
+    motor = MotorGrafico(raw_signal_32canales,None,"señal",None,False,None)
+    motor.graficar_senal(mostrar=False)
+    print("Gráfico de 32 canales generado correctamente")
     assert True
 
 def test_intervalo_valido(raw_signal_monocanal):
@@ -105,5 +121,5 @@ def test_modo_invalido(raw_signal_monocanal):
         motor.actualizar()
     print("Error correctamente detectado para modo de visualización inválido")
 
-#Hasta acá los tes verifican que el objeto se cree correctamente, que se pueden graficar señales de 1xN, 3xN, que se pueden seleccionar intervalos válidos, que se detectan intervalos inválidos, que se detecta la ausencia de señal al graficar y que se detecta un modo de visualización inválido.
+
 

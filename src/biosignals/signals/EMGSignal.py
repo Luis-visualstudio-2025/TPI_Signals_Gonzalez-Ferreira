@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from src.biosignals.signals import RawSignal
+from src.biosignals.signals.RawSignal import RawSignal
 from src.biosignals.info.Info import Info
 from src.biosignals.eventos.Eventos import  Eventos
 from src.biosignals.eventos.Anotaciones import Anotaciones
@@ -16,7 +16,6 @@ class EMGSignal(RawSignal):
     def __init__(self,info: Info, eventos: Eventos, anotaciones: Anotaciones, data: np.ndarray, first_samp: int):
         """
         Inicializa una señal EMG.
-
         Parámetros
         ----------
         info : Info  #Información de adquisición.
@@ -42,12 +41,10 @@ class EMGSignal(RawSignal):
     def calcular_rms(self):
         """
         Calcula el valor RMS de la señal EMG para cada canal.
-        
-        Returns
+        Retorna
         -------
         float  #Valor RMS calculado para cada canal.
         """
-        
         #Fórmula RMS: sqrt(promedio(x^2))
         self.valor_rms = np.sqrt(np.mean(self.data**2, axis=1))
         return self.valor_rms
@@ -55,13 +52,11 @@ class EMGSignal(RawSignal):
     def calcular_envolvente(self, ventana: int = 100):
         """
         Calcula la envolvente de la señal EMG utilizando una ventana móvil.
-
-        EL cálcuoli se realiza mediante: rectifiación y suavizado por media móvil.
-
+        EL cálculo se realiza mediante: rectifiación y suavizado por media móvil.
         Parámetros
         ----------
         ventana : int  #Tamaño de la ventana para el suavizado en muestras.
-        Returns
+        Retorna
         -------
         np.ndarray  #Envolvente calculada para cada canal.
         """
@@ -78,17 +73,15 @@ class EMGSignal(RawSignal):
     def detectar_activacion(self, umbral: float):
         """
         Detecta activación muscular.
-        
         Parámetros
         ----------
         umbral : float  #Valor umbral para detectar activación.
-
-        Returns
+        Retorna
         -------
         np.ndarray  #Matriz booleana indicando activación (True) o no activación (False) para cada canal y muestra.
         """
         #Detectamos muestras cuya amplitud supera el umbral
-        self.activacion_muscular = (self.data > umbral)
+        self.activacion_muscular = np.abs(self.data) > umbral
         return self.activacion_muscular
 
     #::::::::::::::::::::::::::
@@ -127,7 +120,9 @@ class EMGSignal(RawSignal):
         
         #Mostramos RMS si existe
         if self.valor_rms is not None:
-            print(f"RMS: {self.valor_rms:.4f}")
+            print("RMS por canal: ")
+            for nombre, rms in zip(self.info.nombre_canales,self.valor_rms):
+                print(f"{nombre}: {rms:.4f}")
             
     def __str__(self):
         """
@@ -135,4 +130,5 @@ class EMGSignal(RawSignal):
         """
         return (f"EMGSignal : " f"{self.n_channels()} canales," f"{self.n_samples()} muestras, "f"duración {self.duration():.2f} s")
     
+
     

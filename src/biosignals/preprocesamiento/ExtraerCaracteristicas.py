@@ -9,15 +9,15 @@ class ExtraerCaracteristicas:
     Clase encargada de extraer métricas y transformadas de una señal.
     Trabaja con objetos de tipo RawSignal o derivados.
     """
-    raw=RawSignal() #Esto es solo para que no tire error, se debe pasar un objeto RawSignal al crear una instancia de ExtraerCaracteristicas
-    raw.get_data() #Esto es solo para que no tire error, se debe pasar un objeto RawSignal al crear una instancia de ExtraerCaracteristicas
-    
     def __init__(self, signal):
         self.signal = signal
         self.caracteristicas = {}
+
+        if not isinstance(signal, RawSignal):
+            raise TypeError("signal deber ser RawSignal")
        
 
-    def signals(self):
+    def get_signal(self):
         """Retorna la señal original."""
         return self.signal.data
     
@@ -48,7 +48,7 @@ class ExtraerCaracteristicas:
         Calcula la representación Tiempo-Frecuencia para un canal específico.
         """
         # Obtenemos los datos del canal solicitado
-        data = self.signal.get_channels([ch_name])[0] # Tomamos el primer (y único) canal
+        data = self.signal.get_data(picks = [ch_name])[0] # Tomamos el primer (y único) canal
         fs = self.signal.info.frecuencia_muestreo
         
         # Calculamos el espectrograma (Tiempo-Frecuencia)
