@@ -209,13 +209,9 @@ class Epocas:
             
         indices_mantener = [i for i in range(self.data.shape[1]) if i not in indices_eliminar]
         self.data = self.data[:, indices_mantener, :]
-        self.signal.info.nombre_canales = [self.signal.info.nombre_canales[i] for i in indices_mantener]
-        if hasattr(self.signal.info, "tipo_canales"):
-            self.signal.info.tipos_canales = [self.signal.info.tipos_canales[i] for i in indices_mantener]
-        
-        # Sincronizamos la lista de canales vigentes si existía una selección previa
-        if self.picks:
-            self.picks = [ch for ch in self.picks if ch not in canales]
+        #Sincronizamos los canales internamente (SIN tocar self.signal.info)
+        # Esto asegura que la señal RawSignal original quede intacta
+        self.picks = [canales_actuales[i] for i in indices_mantener]
 
     def tiempo_frecuencia(self) -> np.ndarray:
         """Calcula el módulo de la Transformada Rápida de Fourier (FFT) sobre el eje del tiempo."""

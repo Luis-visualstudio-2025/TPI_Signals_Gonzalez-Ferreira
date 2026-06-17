@@ -34,9 +34,7 @@ class EMGSignal(RawSignal):
         #Envolvente EMG
         self.envolvente = None
 
-    #::::::::::::::::::::::::::
     #Métodos de procesamiento
-    #::::::::::::::::::::::::::
 
     def calcular_rms(self):
         """
@@ -89,9 +87,7 @@ class EMGSignal(RawSignal):
         self.activacion_muscular = np.abs(self.data) > umbral
         return self.activacion_muscular
 
-    #::::::::::::::::::::::::::
     #Métodos de visualización
-    #::::::::::::::::::::::::::
 
     def plot_envolvente(self):
         """
@@ -108,20 +104,14 @@ class EMGSignal(RawSignal):
         plt.ylabel("Amplitud")
         plt.show()
 
-    #:::::::::::::::::::::::::
     #Métodos de Información
-    #:::::::::::::::::::::::::
     
     def resumen_emg(self):
         """
         Muestra información resumida de la señal EMG.
         """
-        
-        print("Resumen EMG")
-        print("--------------")
-        print(f"Canales: {self.n_channels()}")
-        print(f"Muestras: {self.n_samples()}")
-        print(f"Duración: {self.duration():.2f} segundos")
+        print("---Resumen EMG---")
+        super().resumen()  # Llama al print genérico de RawSignal
         
         #Mostramos RMS si existe
         if self.valor_rms is not None:

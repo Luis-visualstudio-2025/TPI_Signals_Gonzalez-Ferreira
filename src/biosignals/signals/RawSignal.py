@@ -50,9 +50,8 @@ class RawSignal:
         self.first_samp = first_samp #primera muestra,offfset
 
 #Métodos de la clase RawSignal
-    #::::::::::::::::::::::::::
+
     #Métodos básicos
-    #::::::::::::::::::::::::::
 
     def n_samples(self) -> int:
         """
@@ -108,9 +107,7 @@ class RawSignal:
         """
         return self.data[item] 
     
-    #::::::::::::::::::::::::::::::
     #Métodos de manejo de canales
-    #::::::::::::::::::::::::::::::
 
     def get_channels(self, names: list[str]) -> np.ndarray:
         """
@@ -121,17 +118,20 @@ class RawSignal:
         return self.data[indices]
   
 
-    def drop_channels(self,names:list[str]):
+    def drop_channels(self, names: list[str]):
         """
-        Elimina cnaales de la señal
+        Elimina canales de la señal.
         """
-        #Obtenemos ínidces de canales a eliminar
+        # 1. Validamos PRIMERO que todos los canales existan
+        for name in names:
+            if name not in self.info.nombre_canales:
+                raise ValueError(f"No se puede eliminar el canal '{name}' porque no existe.")
+                
+        # 2. Si todo está bien procedemos a eliminar los canales
         indices = [self.info.nombre_canales.index(name) for name in names]
-        #Obtengo índices de canales a conservar
         keep = [i for i in range(self.n_channels()) if i not in indices]
-        #Actualizo datos
+        
         self.data = self.data[keep]
-        #Actualizo canales
         self.info.nombre_canales = [self.info.nombre_canales[i] for i in keep]
         self.info.tipos_canales = [self.info.tipos_canales[i] for i in keep]
 
@@ -149,10 +149,23 @@ class RawSignal:
         self.info.nombre_canales = [self.info.nombre_canales[i] for i in indices]
         #Actualizo tipos de canales
         self.info.tipos_canales = [self.info.tipos_canales[i] for i in indices]
-
-    #::::::::::::::::::::::::::
+    
+    def pick_channels(self, names: list[str]):
+        """
+        Conserva ÚNICAMENTE los canales indicados, eliminando el resto.
+        """
+        indices_a_conservar = []
+        for name in names:
+            if name not in self.info.nombre_canales:
+                raise ValueError(f"El canal '{name}' no existe.")
+            indices_a_conservar.append(self.info.nombre_canales.index(name))
+            
+        # Actualizamos la matriz y la metadata
+        self.data = self.data[indices_a_conservar]
+        self.info.nombre_canales = [self.info.nombre_canales[i] for i in indices_a_conservar]
+        self.info.tipos_canales = [self.info.tipos_canales[i] for i in indices_a_conservar]
+        
     #Métodos de procesamiento
-    #::::::::::::::::::::::::::
 
     def filter(self, tipo: str = "media", ventana: int = 5):
         """
@@ -193,11 +206,10 @@ class RawSignal:
         self.data = self.data[:, inicio:fin]
         #Actualizo la primera muestra
         self.first_samp += inicio
-        #self.info.set_duration(self.n_samples/fs), este depende de si en Info está set_duration()
+        # le aviso a info que actualice la duración si es que tiene un método para eso, sino info se mantiene con la duración original pero no es un gran problema porque se puede calcular con n_samples y fs
+        self.info.set_duration(self.n_samples/fs) 
 
-    #::::::::::::::::::::::::
     #Métodos de anotaciones
-    #::::::::::::::::::::::::
 
     def set_anotaciones(self, anotaciones: Anotaciones):
         """
@@ -205,9 +217,7 @@ class RawSignal:
         """
         self.anotaciones = anotaciones
 
-    #::::::::::::::::::::::::::
     #Métodos de visualización
-    #::::::::::::::::::::::::::
 
     def plot(self, picks: list[str] = None):
         """
@@ -222,9 +232,7 @@ class RawSignal:
         plt.ylabel("Amplitud")
         plt.show()
     
-    #::::::::::::::::::::::
     #Métodos informativos
-    #::::::::::::::::::::::
 
     def describe(self):
         """"

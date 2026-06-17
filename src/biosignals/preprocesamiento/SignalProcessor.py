@@ -21,9 +21,7 @@ class SignalProcessor:
         """
         self.signal = signal
 
-    #:::::::::::::::::::::
     #Métodos de filtrado
-    #:::::::::::::::::::::
 
     def apply_lowpass(self, ventana: int = 5):
         """
@@ -97,9 +95,7 @@ class SignalProcessor:
 
         return self.signal.__class__(info = nueva_info, eventos = self.signal.eventos, anotaciones = self.signal.anotaciones, data = filtrada, first_samp = self.signal.first_samp)
       
-    #:::::::::::::::::::::::::::
     # Métodos de normalización
-    # ::::::::::::::::::::::::::
 
     def normalize(self):
         """
@@ -114,10 +110,8 @@ class SignalProcessor:
         normalizada = (data - minimo) / (maximo - minimo)
         nueva_info = copy.deepcopy(self.signal.info)
         return self.signal.__class__(info=nueva_info, eventos=self.signal.eventos, anotaciones=self.signal.anotaciones,data=normalizada,first_samp=self.signal.first_samp)
-
-    #::::::::::::::::::::::
+    
     #Métods de remuestreo
-    #::::::::::::::::::::::
 
     def resample(self, nueva_fs: float):
         """
@@ -140,9 +134,7 @@ class SignalProcessor:
         nueva_info.frecuencia_muestreo = nueva_fs
         return self.signal.__class__(info=nueva_info, eventos=self.signal.eventos, anotaciones=self.signal.anotaciones, data=remuestreada, first_samp=self.signal.first_samp)   
     
-    #:::::::::::::::::::::::
     #Métodos de corrección
-    #:::::::::::::::::::::::
 
     def remove_baseline(self):
         """
@@ -154,11 +146,9 @@ class SignalProcessor:
         #Restamos componente lenta para eliminar línea base
         corregida = np.array([canal - np.mean(canal) for canal in self.signal.data])
         nueva_info = copy.deepcopy(self.signal.info)
-        return self.signal.__class__(info=nueva_info.signal.info, eventos=self.signal.eventos, anotaciones=self.signal.anotaciones,data=corregida,first_samp=self.signal.first_samp)  
+        return self.signal.__class__(info=nueva_info, eventos=self.signal.eventos, anotaciones=self.signal.anotaciones, data=corregida, first_samp=self.signal.first_samp)  
     
-    #::::::::::::::::::::::::
     #Métodos de información    
-    #::::::::::::::::::::::::
 
     def __str__(self):
         """
