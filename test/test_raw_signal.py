@@ -140,7 +140,7 @@ def test_describe(raw_signal):
     desc = raw_signal.describe()
     assert desc['n_canales'] == 3
     assert desc['n_muestras'] == 2500
-    assert desc['duración'] == 10.0
+    assert desc['duracion'] == 10.0
     assert desc['fs'] == 250.0
 
 def test_str_representation(raw_signal):
