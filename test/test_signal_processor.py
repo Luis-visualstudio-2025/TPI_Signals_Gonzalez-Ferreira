@@ -15,9 +15,11 @@ def processor():
     
     #info 
     info = Info(
-        frecuencia_muestreo=250.0, 
         nombre_canales=["CH1", "CH2"], 
-        tipos_canales=["eeg", "eeg"]
+        tipos_canales=["eeg", "eeg"],
+        bad_channels=[],                #  (Lista vacía de canales malos)
+        frecuencia_muestreo=250.0, 
+        duracion=4.0                    #  (1000 muestras / 250 Hz = 4.0 segs)
     )
     
     #eventos y anotaciones (Vacíos o mínimos para no interferir con el procesador)

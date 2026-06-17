@@ -73,9 +73,7 @@ class RawSignal:
         fs = self.info.frecuencia_muestreo
         return self.n_samples()/fs
 
-    #:::::::::::::::::::::::::::
     #Métodos de acceso a datos
-    #:::::::::::::::::::::::::::
 
     def get_data(self, picks = None): 
         """
@@ -165,7 +163,7 @@ class RawSignal:
         self.data = self.data[indices_a_conservar]
         self.info.nombre_canales = [self.info.nombre_canales[i] for i in indices_a_conservar]
         self.info.tipos_canales = [self.info.tipos_canales[i] for i in indices_a_conservar]
-        
+
     #Métodos de procesamiento
 
     def filter(self, tipo: str = "media", ventana: int = 5):
@@ -208,7 +206,7 @@ class RawSignal:
         #Actualizo la primera muestra
         self.first_samp += inicio
         # le aviso a info que actualice la duración si es que tiene un método para eso, sino info se mantiene con la duración original pero no es un gran problema porque se puede calcular con n_samples y fs
-        self.info.set_duration(self.n_samples/fs) 
+        self.info.duracion = self.n_samples()/fs 
 
     #Métodos de anotaciones
 

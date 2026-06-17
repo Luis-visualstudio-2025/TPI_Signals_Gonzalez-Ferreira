@@ -23,7 +23,7 @@ def dependencias_mock():
         info_experimentador="Dev",
         eventos=[],
         frecuencia_linea=50.0,
-        frecuencias_corte=[],
+        frecuencias_corte=[0.0, 0.0],
         frecuencias_notch=[]
     )
     eventos = Eventos([(100, 1), (200, 2)])
