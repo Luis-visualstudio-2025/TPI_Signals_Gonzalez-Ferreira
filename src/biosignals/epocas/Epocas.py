@@ -209,6 +209,9 @@ class Epocas:
             
         indices_mantener = [i for i in range(self.data.shape[1]) if i not in indices_eliminar]
         self.data = self.data[:, indices_mantener, :]
+        self.signal.info.nombre_canales = [self.signal.info.nombre_canales[i] for i in indices_mantener]
+        if hasattr(self.signal.info, "tipo_canales"):
+            self.signal.info.tipos_canales = [self.signal.info.tipos_canales[i] for i in indices_mantener]
         
         # Sincronizamos la lista de canales vigentes si existía una selección previa
         if self.picks:
@@ -224,6 +227,8 @@ class Epocas:
         """Devuelve un diccionario estructurado mapeando cada id_evento a una etiqueta legible."""
         if self._eventos_raw.size == 0:
             return {}
+        if isinstance(self.eventos, Eventos):
+            return{id_ev: self.eventos.get_label(id_ev) for id_ev in set(ev[1] for ev in self._eventos_raw)}
         ids_unicos = set([int(ev[1]) for ev in self._eventos_raw])
         return {id_ev: f"Evento {id_ev}" for id_ev in ids_unicos}
     
@@ -243,6 +248,7 @@ class Epocas:
                 nuevos.append((muestra, mapeo.get(id_ev, id_ev)))
             self.eventos.eventos = nuevos
             self._eventos_raw = np.array(nuevos)
+        self.data = self._crear_epocas()
 
     # --- Dunders ---
 

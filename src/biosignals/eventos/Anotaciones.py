@@ -26,6 +26,13 @@ class Anotaciones:
         if not (len(onset)==len(duration)==len(description)):
             raise ValueError("Las lsitas de onset, duration y description deben tener la misma longitud")
         
+        for o, d, desc in zip(onset, duration, description):
+            if o < 0:
+                raise ValueError("onset no puede ser negativo")
+            if d < 0: 
+                raise ValueError("duration no puede ser negativo")
+            if not isinstance(desc, str):
+                raise TypeError("description debe ser un string")
         #Atributos
         #Tiempo de cada anotación
         self.onset = onset
@@ -76,9 +83,16 @@ class Anotaciones:
         duration : float  #Duración
         description : str  #Descripción de la anotación
         """
+        if onset < 0:
+            raise ValueError("onset no puede ser negativo")
+        if duration < 0:
+            raise ValueError("duration no puede ser negativa")
+        if not isinstance(description, str):
+            raise TypeError("description debe ser string")
         self.onset.append(onset)
         self.duration.append(duration)
         self.description.append(description)
+
     def remove(self, index):
         """
         Elimina una anotación según su índice.
@@ -86,9 +100,12 @@ class Anotaciones:
         ----------
         index : int  #índice de la anotación
         """
+        if index < 0 or index >= len(self.onset):
+            raise IndexError("índice fuera de rango")
         del self.onset[index]
         del self.duration[index]
         del self.description[index]
+
     def get_annotations(self):
         """
         Devuelve las anotaciones en formato DataFrame.
@@ -96,7 +113,8 @@ class Anotaciones:
         -------
         pd.DataFrame  #Tabla con anotaciones.
         """
-        return pd.DataFrame({'onset': self.onset,'duration': self.duration,'description': self.description,'t0': self.t0,'ch_names': self.ch_names })
+        return pd.DataFrame({'onset': self.onset,'duration': self.duration,'description': self.description})
+    
     def find(self, description):
         """
         Busca anotaciones por descripción.
@@ -117,8 +135,12 @@ class Anotaciones:
         filname : str  #Nombre del archivo CSV.
         """
         df = self.get_annotations()
+        df["t0"] = self.t0
+        df["ch_names"] = [self.ch_names]*len(df)
         df.to_csv(filename, index=False)
-    def load(self, filename):
+    
+    @classmethod
+    def load(cls, filename):
         """
         Cargamos anotaciones desde un archivo .csv, .txt o .json.
         Parámetros
@@ -132,12 +154,15 @@ class Anotaciones:
             df = pd.read_csv(filename, delimiter='\t')
         elif filename.endswith('.json'):                    ##Si es un archivo JSON, lo leemos con pandas usando el formato de registros
             df = pd.read_json(filename, orient='records')
+        else:
+            raise ValueError("Formato no soportado. Use .csv, .txt o .json")
 
         #Recuperamos columnas
-        self.onset = df['onset'].tolist()
-        self.duration = df['duration'].tolist()
-        self.description = df['description'].tolist()
+        onset = df['onset'].tolist()
+        duration = df['duration'].tolist()
+        description = df['description'].tolist()
         #Recuperamos atributos opocionales
-        self.t0 = df['t0'].iloc[0] if 't0' in df.columns else None
-        self.ch_names = df['ch_names'].iloc[0] if 'ch_names' in df.columns else None
-
+        t0 = df['t0'].iloc[0] if 't0' in df.columns else None
+        ch_names = df['ch_names'].iloc[0] if 'ch_names' in df.columns else None
+        #creamos y devolvemos nueva instancia
+        return cls(onset=onset, duration=duration, description=description, t0=t0, ch_names=ch_names)

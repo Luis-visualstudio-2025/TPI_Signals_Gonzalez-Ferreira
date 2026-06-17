@@ -22,12 +22,12 @@ class ExtraerCaracteristicas:
         return self.signal.data
     
     def mean(self):
-        """Calcula la media por canal."""
-        return np.mean(self.signal.data, axis=1)
+        """Calcula la media sobre la dimensión temporal."""
+        return np.mean(self.signal.data, axis=-1) # el axis = -1 lo hace universal, RawSignal canalesxmuestras, Epocas epocasxcanalesxmuestras
 
     def std(self):
-        """Calcula la desviación estándar por canal."""
-        return np.std(self.signal.data, axis=1)
+        """Calcula la desviación sobre la dimensiíon temporal."""
+        return np.std(self.signal.data, axis=-1)
 
     def get_hilbert_transform(self, picks=None):
         """
@@ -38,7 +38,7 @@ class ExtraerCaracteristicas:
         
         # Aplicamos la transformada de Hilbert por canal
         # La amplitud instantánea es el valor absoluto de la señal analítica
-        analytic_signal = hilbert(data)
+        analytic_signal = hilbert(data, axis = -1)
         amplitude_envelope = np.abs(analytic_signal)
         
         return amplitude_envelope
@@ -60,9 +60,9 @@ class ExtraerCaracteristicas:
         """Calcula la FFT de la señal."""
         fs = self.signal.info.frecuencia_muestreo
         data = self.signal.data
-        n = data.shape[1]
+        n = data.shape[-1]
         
         freqs = np.fft.rfftfreq(n, d=1/fs)
-        fft_values = np.abs(np.fft.rfft(data, axis=1))
+        fft_values = np.abs(np.fft.rfft(data, axis=-1))
         
         return freqs, fft_values

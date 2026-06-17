@@ -20,6 +20,11 @@ class Eventos:
         for evento in eventos:
             if len(evento) != 2:
                 raise ValueError("Cada evento debe ser una tupla (muestra, id_evento)")
+        for muestra, id_evento in eventos:
+            if muestra < 0:
+                raise ValueError("La muestra no puede ser negativa")
+            if not isinstance(id_evento, int):
+                raise TypeError("id_evento debe ser entero")
         #Lista de eventos
         self.eventos = eventos
         if mapeo is None:
@@ -61,7 +66,14 @@ class Eventos:
         muestra : int  #Número de muestra del evento.
         id_evento : int  #Identificador del evento.
         """
+        if muestra < 0:
+            raise ValueError("La muestra no puede ser negativa")
+
+        if not isinstance(id_evento, int):
+            raise TypeError("id_evento debe ser entero")
+
         self.eventos.append((muestra, id_evento))
+        
     def remove(self, index):
         """
         Elimina un evento según índice
@@ -69,7 +81,10 @@ class Eventos:
         ----------
         index : int #Índice del evento a eliminar.
         """
+        if index < 0 or index >= len(self.eventos):
+            raise IndexError("Índice fuera de rango")
         del self.eventos[index]
+    
     def get_events(self):
         """
         Devuelve eventos como DataFrame.
@@ -90,6 +105,19 @@ class Eventos:
         """
         df = self.get_events()
         return df[df['id_evento'] == id_evento]
+    
+    def get_label(self, id_evento):
+        """
+        Devuelve la etiqueta asociada a un id_evento.
+        Parámetros
+        ----------
+        id_evento : int #identificador del evento.
+        Retorna
+        -------
+        str #nombre asociado al evento.
+        """
+        return self.mapeo.get(id_evento, "Desconocido")
+    
     def save(self, filename):
         """
         Guarda eventos en un archivo CSV.
@@ -99,15 +127,12 @@ class Eventos:
         """
         df = self.get_events()
         df.to_csv(filename, index=False)
-    def load(self, filename):
+
+    @classmethod    
+    def load(cls, filename):
         """
         Carga eventos desde un archivo CSV.
-        Parámetros
-        ----------
-        filename : str  #Ruta del archivo CSV.
-        Returns
-        -------
-        None
         """
         df = pd.read_csv(filename)
-        self.eventos = list(zip(df['muestra'], df['id_evento']))
+        eventos = list(zip(df["muestra"], df["id_evento"]))
+        return cls(eventos)
