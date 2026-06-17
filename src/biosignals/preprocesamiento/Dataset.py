@@ -85,6 +85,58 @@ class Dataset:
     def info(self, value: Any) -> None:
         # Aquí idealmente haríamos isinstance(value, Info), pero usamos Any para desacoplar
         self._info = value
+    
+## Metodo para cargar señales desde archivos .txt, .csv, .npy 
+    @staticmethod
+    def carga_de_señal(ruta_archivo: str) -> Dict[str, Any]:
+        """
+        Lee un archivo físico de señal (.txt, .csv, .npy) y extrae sus datos numéricos 
+        junto con metadatos básicos. Retorna un diccionario consumible por Info o RawSignal.
+        """
+        if not isinstance(ruta_archivo, str):
+            raise TypeError("La ruta del archivo debe ser un string.")
+        
+        if not os.path.exists(ruta_archivo):
+            raise FileNotFoundError(f"No se pudo localizar el archivo en: {ruta_archivo}")
+
+        # Extraemos la extensión en minúsculas
+        _, extension = os.path.splitext(ruta_archivo)
+        extension = extension.lower()
+
+        try:
+            # Carga dependiendo del formato
+            if extension == '.npy':
+                datos = np.load(ruta_archivo)
+            elif extension == '.csv':
+                # delimiter=',' es estándar para CSV
+                datos = np.loadtxt(ruta_archivo, delimiter=',')
+            elif extension == '.txt':
+                # loadtxt asume espacios/tabulaciones por defecto
+                datos = np.loadtxt(ruta_archivo)
+            else:
+                raise ValueError(f"Formato no soportado ('{extension}'). Use .npy, .csv o .txt.")
+
+            # Estandarización de dimensiones a 2D (Canales x Muestras)
+            if datos.ndim == 1:
+                # Si es un array plano, asumimos que es 1 solo canal
+                datos = datos.reshape(1, -1)
+            elif datos.ndim > 2:
+                raise ValueError("El archivo contiene matrices de más de 2 dimensiones, formato inválido para señales.")
+
+            n_canales, n_muestras = datos.shape
+
+            # Armamos el diccionario de respuesta (compatible con la clase Info previa)
+            return {
+                "datos_crudos": datos,               # La matriz numérica de Numpy
+                "ch_names": [f"CH_{i+1}" for i in range(n_canales)],
+                "sfreq": 250.0,                      # Frecuencia simulada/default si el archivo puro no la incluye
+                "n_channels": n_canales,
+                "duracion": float(n_muestras / 250.0) 
+            }
+
+        except Exception as e:
+            raise RuntimeError(f"Ocurrió un error al intentar decodificar el archivo '{ruta_archivo}': {str(e)}") 
+
     # Métodos
    
     def add_signal(self, signal: RawSignal) -> None:
@@ -95,30 +147,33 @@ class Dataset:
             raise TypeError("El objeto a agregar debe ser una instancia de RawSignal.")
         self._signals.append(signal)
 
-    def remove_signal(self, index: int):
+    def remove_signal(self, index: int)-> None:
 
         """
-        Elimina una señal del dataset.
+        Elimina una señal del dataset por su índice de forma segura.
 
         Parámetros
         ----------
-        index : int  #Índice de la señal.
-        """
+        index : int  #Índice de la señal a eliminar.
 
+        """
+        if not isinstance(index, int):
+            raise TypeError("El índice debe ser un número entero.")
+        if index < 0 or index >= len(self._signals):
+            raise IndexError(f"Índice {index} fuera de rango. El dataset tiene {len(self._signals)} señales.")
         del self.signals[index]
 
-    def clear(self):
+    def clear(self) -> None:
 
         """
         Elimina todas las señales del dataset.
         """
+        self._signals.clear()
 
-        self.signals.clear()
-
-    def get_signal(self, index: int):
+    def get_signal(self, index: int)-> RawSignal:
 
         """
-        Obtiene una señal del dataset.
+        Obtiene una señal del dataset especifica controlando errores de índice.
 
         Parámetros
         ----------
@@ -128,10 +183,13 @@ class Dataset:
         -------
         RawSignal  #Señal seleccionada.
         """
+        if not isinstance(index, int):
+            raise TypeError("El índice debe ser un número entero.")
+        if index < 0 or index >= len(self._signals):
+            raise IndexError("Índice fuera de rango de las señales disponibles.")
+        return self._signals[index]
 
-        return self.signals[index]
-
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> RawSignal:
 
         """
         Permite acceder mediante [].
@@ -141,32 +199,41 @@ class Dataset:
         dataset[0]
         """
 
-        return self.signals[index]
+        return self.get_signal[index]
 
-    def __len__(self):
+    def __len__(self) -> int:
 
         """
         Devuelve cantidad de señales.
         """
 
-        return len(self.signals)
-
-    def summary(self):
-
-        """
-        Muestra resumen del dataset.
-        """
-
-        print("Resumen Dataset")
-        print("-------------------")
-        print(f"Nombre: {self.name}")
-        print(f"Cantidad señales: {len(self.signals)}")
-        if len(self.signals) > 0:
-            print(f"Canales primera señal: "f"{self.signals[0].n_channels()}")
-            print(f"Muestras primera señal: "f"{self.signals[0].n_samples()}")
-
-    def __str__(self):
+        return len(self._signals)
+    
+    def __str__(self) -> str:
         """
         Representación textual.
         """
-        return (f"Dataset: "f"{len(self.signals)} señales")
+        return f"<Dataset '{self.name}' | {len(self._signals)} señales almacenadas>"
+
+    def summary(self) -> None:
+
+        """
+        Muestra resumen limpio y estructurado del dataset por la consola.
+        """
+
+        print("===============================")
+        print("       Resumen Dataset         ")
+        print("===============================")
+        print(f"Nombre      : {self.name if self.name else 'Sin nombre'}")
+        print(f"Descripción : {self.description if self.description else 'N/A'}")
+        print(f"Señales     : {len(self._signals)}")
+        
+        if len(self._signals) > 0 and hasattr(self._signals[0], 'n_channels'):
+            try:
+                # Comprobamos de manera segura si la señal tiene estos métodos antes de llamarlos
+                print(f"Canales (Sig 0)  : {self._signals[0].n_channels()}")
+                print(f"Muestras (Sig 0) : {self._signals[0].n_samples()}")
+            except Exception:
+                pass
+        print("===============================")
+        
