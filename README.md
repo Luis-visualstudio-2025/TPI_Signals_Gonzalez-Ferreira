@@ -1,4 +1,4 @@
-# 🧠 BioSignals - Procesamiento Digital de Señales Biomédicas
+#  BioSignals - Procesamiento Digital de Señales Biomédicas
 
 **BioSignals** es una biblioteca en Python orientada a objetos diseñada para la lectura, manipulación, procesamiento y extracción de características de señales biomédicas multicanal (EEG, ECG y EMG). 
 
@@ -6,7 +6,7 @@ Desarrollada como **Trabajo Práctico Integrador (TPI)** para la clase de **Prog
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 * **Arquitectura Orientada a Objetos (OOP):** Implementación robusta utilizando herencia y polimorfismo. Una clase base `RawSignal` de la que derivan señales específicas (`EEGSignal`, `ECGSignal`, `EMGSignal`) con comportamientos propios de su dominio.
 * **Validaciones Estrictas:** La clase `Info` actúa como un escudo protector, garantizando la integridad matemática y física de los metadatos (frecuencias de muestreo positivas, coherencia de canales, etc.).
@@ -45,7 +45,7 @@ pip install -e .
 #El flag -e instala el proyecto en modo "editable", lo que significa que si haces cambios en el código fuente, se reflejarán instantáneamente sin tener que volver a instalar).
 ---
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```text
 TPI_SIGNALS_GONZALEZ-FERREIRA/
