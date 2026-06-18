@@ -1,4 +1,4 @@
-# 🧠 BioSignals - Procesamiento Digital de Señales Biomédicas
+# BioSignals - Procesamiento Digital de Señales Biomédicas
 
 **BioSignals** es una biblioteca en Python orientada a objetos diseñada para la lectura, manipulación, procesamiento y extracción de características de señales biomédicas multicanal (EEG, ECG y EMG). 
 
@@ -6,13 +6,22 @@ Desarrollada como **Trabajo Práctico Integrador (TPI)** para la clase de **Prog
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 * **Arquitectura Orientada a Objetos (OOP):** Implementación robusta utilizando herencia y polimorfismo. Una clase base `RawSignal` de la que derivan señales específicas (`EEGSignal`, `ECGSignal`, `EMGSignal`) con comportamientos propios de su dominio.
 * **Validaciones Estrictas:** La clase `Info` actúa como un escudo protector, garantizando la integridad matemática y física de los metadatos (frecuencias de muestreo positivas, coherencia de canales, etc.).
 * **Procesamiento Inmutable (Fail-Safe):** A través de la clase `SignalProcessor`, las señales se procesan sin mutar la data original, retornando siempre nuevas instancias procesadas.
 * **Extracción de Características:** Herramientas nativas para aplicar Transformada Rápida de Fourier (FFT), Transformada de Hilbert y Espectrogramas mediante la clase `ExtraerCaracteristicas`.
 * **Manejo de Épocas:** Segmentación de señales continuas en ventanas de tiempo discretas (`Epocas`) relativas a eventos específicos, facilitando el análisis ERP/ERD.
+---
+
+## ⚠️ Nota Importante sobre la Carga de Datos (Para la Evaluación)
+
+El módulo de entrada/salida (`loader.py` y su función `load_signal`) ha sido diseñado con inteligencia paramétrica para facilitar la evaluación con archivos reales y simulados:
+
+1. **Formatos Admitidos:** El cargador soporta archivos nativos de NumPy (`.npy`) y archivos de texto plano (`.csv`, `.txt`). Al estar diseñado con `**kwargs`, es capaz de leer delimitadores dinámicos e ignorar automáticamente metadatos en texto o marcas de tiempo mediante parámetros como `usecols` y `skiprows`.
+2. **Estricto Estándar de Dimensiones (`Canales x Muestras`):** Por diseño arquitectónico, todas las clases núcleo del proyecto (`RawSignal`, `EEGSignal`, `SignalProcessor`, etc.) exigen **obligatoriamente** que la matriz de datos mantenga la dimensionalidad horizontal: `(canales x muestras)`.
+3. **Transposición Automática (Auto-Fix):** Dado que muchos equipos biomédicos exportan en formato vertical `(muestras x canales)`, el loader implementa una verificación dimensional. Si detecta que la matriz ingresa de forma incorrecta, **la transpone y reorganiza automáticamente a `(canales x muestras)`** antes de inyectarla en el sistema, asegurando que el flujo de procesamiento nunca falle por incompatibilidad de dimensiones.
 
 ---
 ## 2. Instrucciones de instalación
@@ -93,6 +102,8 @@ TPI_SIGNALS_GONZALEZ-FERREIRA/
 |
 └── pyproject.toml    
 ---
+
+
 ## 4. Forma de ejecutar los test
 
 El proyecto cuenta con una sólida suite de pruebas unitarias implementada con `pytest`.
@@ -110,34 +121,112 @@ Si deseas probar únicamente un componente (por ejemplo, RawSignal), puedes espe
 
 #El flag -s es útil para visualizar los print() durante la ejecución.
 ---
+
+
 ## 5. Ejemplo mínimo de uso
-El siguiente ejemplo muestra cómo cargar una señal desde un archivo (usando un Loader), instanciar una señal de tipo EEGSignal y aplicar un filtro de manera segura (inmutable):
+import numpy as np
 
-```bash
-    from src.biosignals.preprocesamiento.Loader import Loader
-    from src.biosignals.signals.EEGsignal import EEGSignal
-    from src.biosignals.preprocesamiento.SignalProcessor import SignalProcessor
+# 1. IMPORTACIONES DE TU ARQUITECTURA DE BIOMEDICINA
+from src.biosignals.io.loader import load_signal  # Tu último loader inteligente
+from src.biosignals.signals.EEGsignal import EEGSignal
+from src.biosignals.preprocesamiento.SignalProcessor import SignalProcessor
+from src.biosignals.preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
+from src.biosignals.visualización.MotorGrafico import MotorGrafico
 
-    # 1. Cargar la señal desde un archivo (ej: .edf, .csv, o formato propio)
-    # El loader retorna los componentes necesarios para la instancia
-    datos_cargados = Loader.load("ruta/a/tu/archivo_eeg.edf")
+if __name__ == "__main__":
+    print("=================================================================")
+    print(" PASO 1: CARGA DE DATOS USANDO TU LOADER INTELIGENTE POLIMÓRFICO")
+    print("=================================================================")
+    
+    # Archivo de destino (Tu loader lo buscará recursivamente si no está en la raíz)
+    nombre_archivo = "eeg.txt"
+    frecuencia_muestreo = 250.0  # Hz estándar para este registro
 
-    # 2. Instanciar la señal específica (EEGSignal)
-    # La clase hereda de RawSignal y valida la integridad de los datos
-    eeg = EEGSignal(
-        info=datos_cargados.info,
-        eventos=datos_cargados.eventos,
-        anotaciones=datos_cargados.anotaciones,
-        data=datos_cargados.data,
-        first_samp=datos_cargados.first_samp
+    # Mapeo clínico real del sistema 10-20 presente en las columnas de eeg.txt
+    canales_clinicos = [
+        'Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2', 'F7', 'F8', 
+        'T7', 'T8', 'P7', 'P8', 'Fz', 'Cz', 'Pz', 'Oz', 'FC1', 'FC2', 'CP1', 'CP2', 
+        'FC5', 'FC6', 'CP5', 'CP6', 'TP9', 'TP10', 'POz', 'ECG'
+    ]
+
+    # Invocamos la función load_signal.
+    # El loader realizará automáticamente:
+    #  - Búsqueda recursiva del archivo en tus carpetas.
+    #  - Salto de cabecera de texto (al capturar el ValueError).
+    #  - Transposición automática de formato Vertical a Horizontal (Canales x Muestras).
+    #  - Asignación de bandas de corte clínicas por defecto de EEG [0.5, 40.0] Hz.
+    senal_eeg = load_signal(
+        file_path=nombre_archivo,
+        signal_class=EEGSignal,
+        fs=frecuencia_muestreo,
+        nombre_canales=canales_clinicos,  # Sobreescribimos los nombres genéricos por defecto
+        info_experimento="Registro Clínico de Prueba S10-20",
+        info_experimentador="Luis Gonzalez"
     )
+    
+    print(" Señal cargada y encapsulada con éxito en un objeto EEGSignal.")
 
-    # 3. Procesamiento seguro (Inmutable)
-    # SignalProcessor retorna una NUEVA instancia sin modificar 'eeg'
-    procesador = SignalProcessor(eeg)
-    eeg_filtrado = procesador.apply_lowpass(ventana=5)
+    print("\n=================================================================")
+    print(" PASO 2: COMPROBACIÓN DE DIMENSIONES Y CONFIGURACIÓN CLÍNICA")
+    print("=================================================================")
+    print(f"Dimensiones de la matriz (data): {senal_eeg.data.shape} -> ¡Organizado como (Canales x Muestras)!")
+    print(f"Frecuencia de Muestreo: {senal_eeg.info.frecuencia_muestreo} Hz")
+    print(f"Cantidad Total de Canales: {senal_eeg.n_channels()}")
+    print(f"Cantidad de Muestras Temporales: {senal_eeg.n_samples()}")
+    print(f"Duración de la Grabación: {senal_eeg.duration():.2f} segundos")
+    print(f"Filtros analógicos/clínicos por defecto: {senal_eeg.info.frecuencias_corte} Hz")
 
-    # 4. Análisis y Visualización
-    # EEGSignal tiene métodos específicos para graficar FFT, Hilbert o Espectrogramas
-    eeg_filtrado.plot_fft()
+    print("\n=================================================================")
+    print(" PASO 3: PIPELINE DE PROCESAMIENTO DIGITAL (INMUTABLE)")
+    print("=================================================================")
+    # Instanciamos el procesador asignándole la señal cruda
+    procesador = SignalProcessor(signal=senal_eeg)
+    
+    # 1. Eliminamos el offset de corriente continua (Línea base) centrando las señales en 0.
+    # Nota: Tu SignalProcessor devuelve una copia modificada sin alterar 'senal_eeg'
+    senal_sin_dc = procesador.remove_baseline()
+    
+    # 2. Aplicamos un suavizado pasabajos (media móvil de 5 muestras) a las señales centradas
+    senal_filtrada = SignalProcessor(signal=senal_sin_dc).apply_lowpass(ventana=5)
+    print(" Filtrado completado. Se generó un nuevo objeto manteniendo la señal original intacta.")
+
+    print("\n=================================================================")
+    print(" PASO 4: EXTRACCIÓN DE MÉTRICAS Y CARACTERÍSTICAS BIOMÉDICAS")
+    print("=================================================================")
+    # Instanciamos el extractor utilizando la señal previamente filtrada
+    extractor = ExtraerCaracteristicas(signal=senal_filtrada)
+    
+    # Calculamos métricas universales sobre el eje del tiempo
+    lista_medias = extractor.mean()
+    lista_desviaciones = extractor.std()
+    
+    # Desplegamos resultados de canales de relevancia clínica frontal, occipital y cardíaca
+    canales_interes = ['Fp1', 'O1', 'ECG']
+    for ch in canales_interes:
+        idx = canales_clinicos.index(ch)
+        print(f"Canal [{ch}] -> Media: {lista_medias[idx]:.4f} µV | Desviación Estándar (uV): {lista_desviaciones[idx]:.4f}")
+
+    print("\n=================================================================")
+    print("PASO 5: VISUALIZACIÓN EN RENGLONES INDEPENDIENTES (SUBPLOTS)")
+    print("=================================================================")
+    # Seleccionamos un subconjunto claro de canales para desplegar en pantalla
+    canales_a_graficar = ['Fp1', 'Fp2', 'O1', 'O2', 'ECG']
+    
+    # Configuramos el motor gráfico interactivo
+    motor = MotorGrafico(
+        senal_actual=senal_filtrada,
+        epocas=None,
+        modo_visualizacion="señal",
+        canales_visibles=canales_a_graficar,
+        mostrar_anotaciones=False,
+        rango_tiempo=(0.0, 40.0)  # Graficamos una ventana de tiempo de los primeros 40 segundos
+    )
+    
+    print(f"Renderizando subgráficas para los canales: {canales_a_graficar}...")
+    # Llamamos al nuevo método multi-renglón que integraste en tu clase MotorGrafico
+    motor.graficar_por_renglones(mostrar=True)
+    
+    print("=================================================================")
+    print(" Fin de la ejecución del pipeline completo de BioSignals.")
+    print("=================================================================")
 ---

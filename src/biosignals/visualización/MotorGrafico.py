@@ -44,11 +44,8 @@ class MotorGrafico():
         self.mostrar_anotaciones = mostrar_anotaciones
         self.rango_tiempo = rango_tiempo
     
-
-    #::::::::::::::::::::::::::
     #Métodos de visualización
-    #::::::::::::::::::::::::::
-
+    
     def graficar_senal(self, mostrar=True):
         """
         Grafica la señal biomédica actual.
@@ -88,10 +85,64 @@ class MotorGrafico():
         #Mostramos 
         if mostrar:
             plt.show()
+    def graficar_por_renglones(self, mostrar: bool = True):
+        """
+        Grafica los canales seleccionados en renglones separados (subplots)
+        para evitar que se superpongan las señales.
+        """
+        if self.senal_actual is None:
+            raise ValueError("No hay ninguna señal cargada para graficar.")
+            
+        # 1. Filtrar los canales que el usuario quiere ver
+        canales_a_ver = self.canales_visibles if self.canales_visibles else self.senal_actual.info.nombre_canales
+        n_canales = len(canales_a_ver)
+        
+        if n_canales == 0:
+            raise ValueError("No se seleccionaron canales válidos para graficar.")
 
-    #:::::::::::::::::::::::::::::::
+        # 2. Configurar ventanas de tiempo usando tus propiedades
+        fs = self.senal_actual.info.frecuencia_muestreo
+        if self.rango_tiempo:
+            tmin, tmax = self.rango_tiempo
+            idx_inicio = max(0, int(tmin * fs))
+            idx_fin = min(self.senal_actual.n_samples(), int(tmax * fs))
+        else:
+            idx_inicio, idx_fin = 0, self.senal_actual.n_samples()
+
+        vector_tiempo = np.arange(idx_inicio, idx_fin) / fs
+
+        # 3. Crear la figura con múltiples renglones (sharex=True para sincronizar el zoom temporal)
+        fig, axes = plt.subplots(nrows=n_canales, ncols=1, figsize=(12, 2 * n_canales), sharex=True)
+        
+        # Corrección si es un solo canal (para que siga siendo indexable)
+        if n_canales == 1:
+            axes = [axes]
+
+        # 4. Iterar y graficar canal por canal
+        for i, nombre_ch in enumerate(canales_a_ver):
+            # Usamos el método get_data de tu RawSignal
+            datos_canal = self.senal_actual.get_data(picks=[nombre_ch])[0, idx_inicio:idx_fin]
+            
+            # Restamos la media para centrar y que luzca clínico
+            datos_canal_centrados = datos_canal - np.mean(datos_canal)
+            
+            # Dibujar en su renglón correspondiente
+            axes[i].plot(vector_tiempo, datos_canal_centrados, linewidth=0.8)
+            
+            # Nombre del canal a la izquierda en horizontal
+            axes[i].set_ylabel(nombre_ch, rotation=0, labelpad=20, fontsize=10, fontweight='bold')
+            axes[i].grid(True, linestyle='--', alpha=0.5)
+
+        # Configurar el eje de tiempo final en el último renglón
+        axes[-1].set_xlabel("Tiempo (segundos)", fontsize=12)
+        fig.suptitle("Visualización por Renglones Independientes", fontsize=14, fontweight='bold')
+        
+        plt.tight_layout()
+        
+        if mostrar:
+            plt.show()
+
     # Métodos de visualización: Épocas
-    #:::::::::::::::::::::::::::::::
 
     def graficar_epocas(self, mostrar: bool = True):
         """
@@ -178,9 +229,7 @@ class MotorGrafico():
         if mostrar:
             plt.show()
     
-    #::::::::::::::::::::::::::::::::::
     #Métodos de Eventos y Anotaciones
-    #::::::::::::::::::::::::::::::::::
 
     def resaltar_eventos(self):
         """
@@ -210,9 +259,7 @@ class MotorGrafico():
             #Agrregamos una etiqueta
             plt.text(muestra, plt.ylim()[1], str(id_evento), rotation = 90) 
 
-    #::::::::::::::::::::::::::
     #Métodos de configuración
-    #::::::::::::::::::::::::::
 
     def seleccionar_intervalo(self, inicio : float, fin : float):
         """
@@ -233,9 +280,7 @@ class MotorGrafico():
         self.rango_tiempo = (inicio,fin)
         #NO OLVIDAR AGREGAR EL ATRIBUTO rango_tiempo EN EL DIAGRAMA UML DE LA CLASE MOTORGRAFICO
 
-    #:::::::::::::::::::::::::::::::::::::
     #Métodos de Actualización y Limpieza
-    #:::::::::::::::::::::::::::::::::::::
 
     def actualizar(self):
         """
@@ -265,9 +310,7 @@ class MotorGrafico():
         #Reiniciamos el intervalo 
         self.rango_tiempo = None 
 
-    #::::::::::::::::::::::::
     #Métodos de exportación
-    #::::::::::::::::::::::::
 
     def guardar_imagen(self,path : str):
         """
@@ -299,5 +342,5 @@ class MotorGrafico():
    
         #Probar si grafica señales de 1xN, o 3xN etc, si es lo suficiente general
 
-
+    
         
