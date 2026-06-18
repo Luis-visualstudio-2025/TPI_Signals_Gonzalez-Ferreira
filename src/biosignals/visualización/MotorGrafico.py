@@ -278,7 +278,7 @@ class MotorGrafico():
             raise ValueError("El inicio debe ser menor que el fin")
         #Guardamos el intervalo
         self.rango_tiempo = (inicio,fin)
-        #NO OLVIDAR AGREGAR EL ATRIBUTO rango_tiempo EN EL DIAGRAMA UML DE LA CLASE MOTORGRAFICO
+        
 
     #Métodos de Actualización y Limpieza
 

@@ -14,9 +14,9 @@ def _buscar_archivo_recursivo(file_name: str, search_path: str = ".") -> str:
     for root, dirs, files in os.walk(search_path):
         if nombre_base in files:
             ruta_encontrada = os.path.join(root, nombre_base)
-            print(f"🎯 Archivo localizado en: '{ruta_encontrada}'")
+            print(f" Archivo localizado en: '{ruta_encontrada}'")
             return ruta_encontrada
-    raise FileNotFoundError(f"❌ Error: No se encontró el archivo '{nombre_base}'.")
+    raise FileNotFoundError(f" Error: No se encontró el archivo '{nombre_base}'.")
 
 def load_signal(file_path: str, signal_class: type = RawSignal, fs: float = 250.0, **kwargs) -> RawSignal:
     """
@@ -37,7 +37,7 @@ def load_signal(file_path: str, signal_class: type = RawSignal, fs: float = 250.
         try:
             data = np.loadtxt(file_path, delimiter=delim, usecols=ucols)
         except ValueError:
-            print("📝 Cabezal de texto detectado. Saltando primera línea...")
+            print(" Cabezal de texto detectado. Saltando primera línea...")
             data = np.loadtxt(file_path, delimiter=delim, skiprows=1, usecols=ucols)
     else:
         raise ValueError(f"Formato {ext} no soportado.")
@@ -47,7 +47,7 @@ def load_signal(file_path: str, signal_class: type = RawSignal, fs: float = 250.
 
     # 2. Transposición Inteligente
     if data.shape[0] > data.shape[1]:
-        print(f"🔄 Transponiendo automáticamente formato vertical a horizontal...")
+        print(f" Transponiendo automáticamente formato vertical a horizontal...")
         data = data.T 
 
     n_channels = data.shape[0]

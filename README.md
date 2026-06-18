@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # BioSignals - Procesamiento Digital de Señales Biomédicas
+=======
+#  BioSignals - Procesamiento Digital de Señales Biomédicas
+>>>>>>> a415385b52bfe4e3dafa75b2b0b4741d53c2d0b1
 
 **BioSignals** es una biblioteca en Python orientada a objetos diseñada para la lectura, manipulación, procesamiento y extracción de características de señales biomédicas multicanal (EEG, ECG y EMG). 
 
@@ -54,7 +58,7 @@ pip install -e .
 #El flag -e instala el proyecto en modo "editable", lo que significa que si haces cambios en el código fuente, se reflejarán instantáneamente sin tener que volver a instalar).
 ---
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```text
 TPI_SIGNALS_GONZALEZ-FERREIRA/
@@ -126,8 +130,8 @@ Si deseas probar únicamente un componente (por ejemplo, RawSignal), puedes espe
 ## 5. Ejemplo mínimo de uso
 import numpy as np
 
-# 1. IMPORTACIONES DE TU ARQUITECTURA DE BIOMEDICINA
-from src.biosignals.io.loader import load_signal  # Tu último loader inteligente
+
+from src.biosignals.io.loader import load_signal  
 from src.biosignals.signals.EEGsignal import EEGSignal
 from src.biosignals.preprocesamiento.SignalProcessor import SignalProcessor
 from src.biosignals.preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
@@ -135,10 +139,10 @@ from src.biosignals.visualización.MotorGrafico import MotorGrafico
 
 if __name__ == "__main__":
     print("=================================================================")
-    print(" PASO 1: CARGA DE DATOS USANDO TU LOADER INTELIGENTE POLIMÓRFICO")
+    print(" CARGA DE DATOS USANDO EL LOADER")
     print("=================================================================")
     
-    # Archivo de destino (Tu loader lo buscará recursivamente si no está en la raíz)
+    # Archivo de destino (El loader lo buscará recursivamente si no está en la raíz)
     nombre_archivo = "eeg.txt"
     frecuencia_muestreo = 250.0  # Hz estándar para este registro
 
@@ -167,7 +171,7 @@ if __name__ == "__main__":
     print(" Señal cargada y encapsulada con éxito en un objeto EEGSignal.")
 
     print("\n=================================================================")
-    print(" PASO 2: COMPROBACIÓN DE DIMENSIONES Y CONFIGURACIÓN CLÍNICA")
+    print(" COMPROBACIÓN DE DIMENSIONES Y CONFIGURACIÓN CLÍNICA")
     print("=================================================================")
     print(f"Dimensiones de la matriz (data): {senal_eeg.data.shape} -> ¡Organizado como (Canales x Muestras)!")
     print(f"Frecuencia de Muestreo: {senal_eeg.info.frecuencia_muestreo} Hz")
@@ -177,7 +181,7 @@ if __name__ == "__main__":
     print(f"Filtros analógicos/clínicos por defecto: {senal_eeg.info.frecuencias_corte} Hz")
 
     print("\n=================================================================")
-    print(" PASO 3: PIPELINE DE PROCESAMIENTO DIGITAL (INMUTABLE)")
+    print(" PROCESAMIENTO DIGITAL (INMUTABLE)")
     print("=================================================================")
     # Instanciamos el procesador asignándole la señal cruda
     procesador = SignalProcessor(signal=senal_eeg)
@@ -191,7 +195,7 @@ if __name__ == "__main__":
     print(" Filtrado completado. Se generó un nuevo objeto manteniendo la señal original intacta.")
 
     print("\n=================================================================")
-    print(" PASO 4: EXTRACCIÓN DE MÉTRICAS Y CARACTERÍSTICAS BIOMÉDICAS")
+    print(" EXTRACCIÓN DE MÉTRICAS Y CARACTERÍSTICAS BIOMÉDICAS")
     print("=================================================================")
     # Instanciamos el extractor utilizando la señal previamente filtrada
     extractor = ExtraerCaracteristicas(signal=senal_filtrada)
@@ -207,7 +211,7 @@ if __name__ == "__main__":
         print(f"Canal [{ch}] -> Media: {lista_medias[idx]:.4f} µV | Desviación Estándar (uV): {lista_desviaciones[idx]:.4f}")
 
     print("\n=================================================================")
-    print("PASO 5: VISUALIZACIÓN EN RENGLONES INDEPENDIENTES (SUBPLOTS)")
+    print("VISUALIZACIÓN EN RENGLONES (SUBPLOTS)")
     print("=================================================================")
     # Seleccionamos un subconjunto claro de canales para desplegar en pantalla
     canales_a_graficar = ['Fp1', 'Fp2', 'O1', 'O2', 'ECG']
@@ -227,6 +231,6 @@ if __name__ == "__main__":
     motor.graficar_por_renglones(mostrar=True)
     
     print("=================================================================")
-    print(" Fin de la ejecución del pipeline completo de BioSignals.")
+    print(" Fin de la ejecución .")
     print("=================================================================")
 ---
