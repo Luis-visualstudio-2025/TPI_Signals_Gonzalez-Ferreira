@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib
 #sin abrir ventanas
 matplotlib.use("Agg")
-
+from unittest.mock import patch
 from src.biosignals.visualización.MotorGrafico import MotorGrafico
 from src.biosignals.signals.RawSignal import RawSignal
 from src.biosignals.info.Info import Info
@@ -120,6 +120,28 @@ def test_modo_invalido(raw_signal_monocanal):
     with pytest.raises(ValueError):
         motor.actualizar()
     print("Error correctamente detectado para modo de visualización inválido")
+
+@patch("src.biosignals.visualización.MotorGrafico.plt.show")
+def test_graficar_por_renglones_exito(mock_show, raw_signal_3canales):
+    print("\nProbando graficar multicanal por renglones")
+    # Instanciamos el motor con tu fixture de 3 canales
+    motor = MotorGrafico(raw_signal_3canales, None, "señal", None, False, None)
+    
+    # Ejecutamos el método con mostrar=True (comportamiento por defecto)
+    motor.graficar_por_renglones()
+    
+    # Verificamos que llegó al final de la lógica y llamó a mostrar la figura
+    mock_show.assert_called_once()
+    print("Gráfico por renglones generado correctamente")
+
+def test_graficar_por_renglones_sin_senal():
+    print("\nProbando error al graficar renglones sin señal")
+    motor = MotorGrafico(None, None, "señal", None, False, None)
+    
+    # Verificamos que ataje correctamente el error
+    with pytest.raises(ValueError):
+        motor.graficar_por_renglones()
+    print("Error detectado correctamente")
 
 
 

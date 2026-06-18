@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# BioSignals - Procesamiento Digital de Señales Biomédicas
-=======
 #  BioSignals - Procesamiento Digital de Señales Biomédicas
->>>>>>> a415385b52bfe4e3dafa75b2b0b4741d53c2d0b1
 
 **BioSignals** es una biblioteca en Python orientada a objetos diseñada para la lectura, manipulación, procesamiento y extracción de características de señales biomédicas multicanal (EEG, ECG y EMG). 
 

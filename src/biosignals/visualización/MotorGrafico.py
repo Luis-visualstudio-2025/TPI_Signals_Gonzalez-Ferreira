@@ -200,7 +200,6 @@ class MotorGrafico():
     def graficar_tiempo_frecuencia_epocas(self, indices_epocas: list[int] = None, mostrar: bool = True):
         """
         Grafica la representación en tiempo-frecuencia para una o más épocas.
-        Cumple con el requisito del PDF: cada época en una NUEVA ventana.
         """
         if self.epocas is None or len(self.epocas) == 0: 
             raise ValueError("No hay épocas cargadas.")

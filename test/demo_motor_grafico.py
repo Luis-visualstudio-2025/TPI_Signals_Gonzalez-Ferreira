@@ -9,6 +9,7 @@ from src.biosignals.signals.EMGSignal import EMGSignal
 from src.biosignals.signals.EEGsignal import EEGSignal
 from src.biosignals.preprocesamiento.SignalProcessor import SignalProcessor
 from src.biosignals.preprocesamiento.ExtraerCaracteristicas import ExtraerCaracteristicas
+from src.biosignals.visualización.MotorGrafico import MotorGrafico
 
 """
 Este script demuestra el funconamiento completo de la librería utilizando señales sintéticas.
@@ -111,6 +112,39 @@ eeg.plot_fft()
 eeg.plot_hilbert()
 #espectrograma de un canal específico
 eeg.plot_spectrogram("C3")
+
+"""
+Demostración del motor gráfico
+"""
+print("\n=== Motor Gráfico: Visualización Multicanal ===")
+#instanciamos el motor con la señal EEG completa (3 canales)
+#le ponemos un rango de tiempo de 0 a 3 segundos para que se vea claro el zoom temporal
+motor_eeg = MotorGrafico(
+    senal_actual=eeg,
+    epocas=None,
+    modo_visualizacion="señal",
+    canales_visibles=None,
+    mostrar_anotaciones=True,
+    rango_tiempo=(0, 3.0) 
+)
+motor_eeg.graficar_por_renglones()
+
+print("\n=== Motor Gráfico: Visualización de Épocas ===")
+#cambiamos el motor para que ahora grafique las épocas que se segmentaron anteriormente
+motor_epocas = MotorGrafico(
+    senal_actual=eeg,
+    epocas=epocas,
+    modo_visualizacion="epocas",
+    canales_visibles=None,
+    mostrar_anotaciones=False,
+    rango_tiempo=None
+)
+
+#graficamos todas las épocas lado a lado
+motor_epocas.graficar_epocas()
+
+#graficamos el espectrograma (tiempo-frecuencia) independiente de cada época
+motor_epocas.graficar_tiempo_frecuencia_epocas()
 
 """
 Creación de EMG Sintético
