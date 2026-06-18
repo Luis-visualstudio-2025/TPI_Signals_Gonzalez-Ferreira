@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-
+from unittest.mock import patch
 from src.biosignals.signals.EEGsignal import EEGSignal
 from src.biosignals.info.Info import Info
 from src.biosignals.eventos.Eventos import Eventos
@@ -88,17 +88,20 @@ def test_get_epochs(eeg_signal):
     epocas = eeg_signal.get_epochs(id_eventos=[1], tmin=-0.2, tmax=0.5)
     assert epocas is not None
 
-def test_plot_fft(eeg_signal):
+@patch("src.biosignals.signals.EEGsignal.plt.show")
+def test_plot_fft(mock_show, eeg_signal):
     eeg_signal.plot_fft()
-    assert True
+    mock_show.assert_called_once()
 
-def test_plot_hilbert(eeg_signal):
+@patch("src.biosignals.signals.EEGsignal.plt.show")
+def test_plot_hilbert(mock_show, eeg_signal):
     eeg_signal.plot_hilbert()
-    assert True
+    mock_show.assert_called_once()
 
-def test_plot_spectrogram(eeg_signal):
+@patch("src.biosignals.signals.EEGsignal.plt.show")
+def test_plot_spectrogram(mock_show, eeg_signal):
     eeg_signal.plot_spectrogram("C3")
-    assert True
+    mock_show.assert_called_once()
 
 def test_str(eeg_signal):
     texto = str(eeg_signal)

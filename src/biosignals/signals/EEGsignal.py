@@ -18,12 +18,11 @@ class EEGSignal(RawSignal):
                  times=None, montage=None, ref_type='common', units='µV', 
                  subject_info=None, fecha=None):
         
-        # 1. Llamada al constructor de la clase base (RawSignal)
-        # RawSignal ya valida que data sea 2D y first_samp >= 0
+        #1. Llamada al constructor de la clase base (RawSignal)
+        #RawSignal ya valida que data sea 2D y first_samp >= 0
         super().__init__(info, eventos, anotaciones, data, first_samp)
         
-        # 2. Atributos específicos del estándar 4.3.2
-        self.info.frecuencia_muestreo = info.frecuencia_muestreo # Aseguramos que la frecuencia de muestreo esté presente en info
+        #2. Atributos específicos del estándar
         self.times = times if times is not None else np.arange(self.data.shape[1]) / self.info.frecuencia_muestreo
         self.montage = montage
         self.ref_type = ref_type
@@ -64,8 +63,7 @@ class EEGSignal(RawSignal):
                 warnings.warn(f"WARNING: El intervalo temporal entre muestras ({dt_real:.6f}s) "
                               f"no coincide con la frecuencia de muestreo ({self.info.frecuencia_muestreo}Hz).")
 
-    # --- MÉTODOS QUE RETORNAN NUEVAS INSTANCIAS (INMUTABILIDAD) ---
-   
+
     def picks_channels(self, names: list[str]):
         #"""Retorna una nueva instancia de EEGSignal con los canales seleccionados."""
         import copy

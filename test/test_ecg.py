@@ -2,10 +2,9 @@
 import pytest
 import numpy as np
 import matplotlib
-
 #evita abrir ventanas gráficas
 matplotlib.use("Agg")
-
+from unittest.mock import patch
 from src.biosignals.signals.ECGSignal import ECGSignal
 from src.biosignals.info.Info import Info
 from src.biosignals.eventos.Eventos import Eventos
@@ -83,6 +82,19 @@ def test_detectar_arritmias(ecg_signal):
     arritmias = ecg_signal.detectar_arritmias()
     #como todos los RR son 0.8 (normales), no debería haber
     assert len(arritmias) == 0
+
+@patch("src.biosignals.signals.ECGSignal.plt.show")
+def test_plot_ecg(mock_show, ecg_signal):
+    """Verifica que plot_ecg intente renderizar la señal correctamente."""
+    ecg_signal.plot_ecg()
+    mock_show.assert_called_once()
+
+@patch("src.biosignals.signals.ECGSignal.plt.show")
+def test_plot_picos(mock_show, ecg_signal):
+    """Verifica que plot_picos renderice correctamente tras detectar picos."""
+    ecg_signal.detectar_picos(umbral=0.9)
+    ecg_signal.plot_picos()
+    mock_show.assert_called_once()
 
 #test de errores
 def test_error_rr_sin_picos(ecg_signal):

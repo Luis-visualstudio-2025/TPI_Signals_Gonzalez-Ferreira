@@ -37,7 +37,7 @@ times = np.arange(n_samples)/fs
 Creación de metada (Info)
 """
 #información general de la adqusisción
-info = Info(frecuencia_muestreo=fs, nombre_canales=["C3","C4","Pz"], tipos_canales=["EEG","EEG","EEG"])
+info = Info(frecuencia_muestreo=fs, nombre_canales=["C3","C4","Pz"], tipos_canales=["EEG","EEG","EEG"], bad_channels=[],duracion=duracion)
 
 """
 Creación de eventos
@@ -59,9 +59,9 @@ eeg = EEGSignal(info = info, eventos=eventos,anotaciones=anotaciones, data=eeg_d
 #mostramos información general
 print("\n ===EEF Signal===")
 print(eeg)
-print("\===Eventos===")
+print("\n===Eventos===")
 print(eventos)
-print("\===Anotaciones===")
+print("\n===Anotaciones===")
 print(anotaciones)
 
 """
@@ -119,7 +119,7 @@ print("\n===EMG Signal===")
 #simulación de señal EMG con ruido
 emg_data = np.array([np.random.randn(n_samples)*0.2])
 #metadata EMG
-emg_info = Info(frecuencia_muestreo=fs, nombre_canales=["EMG1"], tipos_canales=["EMG"])
+emg_info = Info(frecuencia_muestreo=fs, nombre_canales=["EMG1"], tipos_canales=["EMG"], bad_channels=[], duracion=duracion)
 #creamos objetos EMGSignal
 emg = EMGSignal(info=emg_info,eventos=eventos,anotaciones=anotaciones, data=emg_data,first_samp=0)
 print(emg)
@@ -154,7 +154,7 @@ for beat in np.arange(0.5, duracion, 1.0):
     ecg_signal += 0.35 * np.exp(-((times - (beat + 0.25))**2) / (2 * 0.04**2))
 ecg_data = np.array([ecg_signal])
 #metadata ECG
-ecg_info = Info(frecuencia_muestreo=fs,nombre_canales=["ECG1"],tipos_canales=["ECG"])
+ecg_info = Info(frecuencia_muestreo=fs,nombre_canales=["ECG1"],tipos_canales=["ECG"], bad_channels=[], duracion = duracion)
 #creamos objeto ECGSignal
 ecg = ECGSignal(info=ecg_info,eventos=eventos,anotaciones=anotaciones,data=ecg_data,first_samp=0)
 print(ecg)

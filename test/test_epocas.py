@@ -20,6 +20,7 @@ def configuracion_base():
         frecuencia_muestreo=250.0,
         nombre_canales=["C3", "Cz", "C4"],
         tipos_canales=["eeg", "eeg", "eeg"],
+        bad_channels=[],
         duracion=4.0)
 
     #creamos eventos
@@ -124,7 +125,7 @@ def test_eliminar_canales(configuracion_base):
     epocas.eliminar_canales(["Cz"])
     
     assert epocas.get_data().shape[1] == 2
-    assert "Cz" not in epocas.signal.info.nombre_canales
+    assert "Cz" not in epocas.picks
     
     #comprobar manejo de errores con canal no existente
     with pytest.raises(ValueError, match="Imposible eliminar canales no existentes"):

@@ -14,7 +14,9 @@ def senal_prueba():
     info = Info(
         frecuencia_muestreo=250.0,
         nombre_canales=["CH1", "CH2"],
-        tipos_canales=["eeg", "eeg"]
+        tipos_canales=["eeg", "eeg"],
+        bad_channels=[],
+        duracion=4.0 #1000 muestras / 250 Hz = 4.0 s
     )
     
     #señal de 2 canales y 1000 muestras

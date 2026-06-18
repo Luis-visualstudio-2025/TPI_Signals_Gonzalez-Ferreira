@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 #evita abrir ventanas gráficas
 matplotlib.use("Agg")
-
+from unittest.mock import patch
 from src.biosignals.signals.EMGSignal import EMGSignal
 from src.biosignals.info.Info import Info
 from src.biosignals.eventos.Eventos import Eventos
@@ -70,10 +70,11 @@ def test_plot_envolvente_error(emg_signal):
     with pytest.raises(ValueError):
         emg_signal.plot_envolvente()
 
-def test_plot_envolvente(emg_signal):
+@patch("src.biosignals.signals.EMGSignal.plt.show")
+def test_plot_envolvente(mock_show, emg_signal):
     emg_signal.calcular_envolvente()
     emg_signal.plot_envolvente()
-    assert True
+    mock_show.assert_called_once()
 
 def test_str(emg_signal):
     salida = str(emg_signal)
